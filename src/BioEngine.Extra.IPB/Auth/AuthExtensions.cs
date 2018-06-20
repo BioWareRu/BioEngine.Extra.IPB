@@ -25,7 +25,10 @@ namespace BioEngine.Extra.IPB.Auth
         public static IWebHostBuilder AddIPBTokenAuth(this IWebHostBuilder webHostBuilder)
         {
             webHostBuilder.ConfigureServices(
-                (context, services) => { services.AddIPBTokenAuth(context.Configuration); });
+                (context, services) =>
+                {
+                    services.AddIPBTokenAuth(context.Configuration);
+                });
             webHostBuilder.Configure(app => { app.UseIPBTokenAuth(); });
             return webHostBuilder;
         }

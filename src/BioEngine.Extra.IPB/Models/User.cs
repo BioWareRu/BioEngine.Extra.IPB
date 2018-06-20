@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BioEngine.Core.Interfaces;
 
 namespace BioEngine.Extra.IPB.Models
 {
-    public class User
+    public class User : IUser
     {
         public int Id { get; set; }
         public string Name { get; set; }

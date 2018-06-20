@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using BioEngine.Core.Interfaces;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Models;
 using JetBrains.Annotations;
@@ -131,18 +132,12 @@ namespace BioEngine.Extra.IPB.Auth
         }
     }
 
-    public interface ICurrentUserFeature
-    {
-        User User { get; }
-        string Token { get; }
-    }
-
     public class CurrentUserFeature : ICurrentUserFeature
     {
-        public User User { get; }
+        public IUser User { get; }
         public string Token { get; }
 
-        public CurrentUserFeature(User user, string token)
+        public CurrentUserFeature(IUser user, string token)
         {
             User = user;
             Token = token;
