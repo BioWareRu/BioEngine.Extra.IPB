@@ -1,8 +1,13 @@
 ﻿using System;
+using BioEngine.Core.Interfaces;
+using BioEngine.Core.Providers;
+using BioEngine.Extra.IPB.Api;
+using BioEngine.Extra.IPB.Filters;
+using BioEngine.Extra.IPB.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BioEngine.Extra.IPB.Api
+namespace BioEngine.Extra.IPB
 {
     public static class WebHostBuilderExtensions
     {
@@ -25,7 +30,15 @@ namespace BioEngine.Extra.IPB.Api
                         config.ClientId = context.Configuration["IPB_API_CLIENT_ID"];
                     });
                     services.AddSingleton<IPBApiClientFactory>();
+                    services.AddMvc().AddApplicationPart(typeof(WebHostBuilderExtensions).Assembly);
+                    services.AddScoped<IRepositoryFilter, IPBContentFilter>();
+                    services.AddScoped<ISettingsOptionsResolver, IPBSectionSettingsOptionsResolver>();
                 });
+            
+            SettingsProvider.RegisterBioEngineSectionSettings<IPBSectionSettings>();
+            SettingsProvider.RegisterBioEngineContentSettings<IPBContentSettings>();
+            
+            
             return webHostBuilder;
         }
     }
