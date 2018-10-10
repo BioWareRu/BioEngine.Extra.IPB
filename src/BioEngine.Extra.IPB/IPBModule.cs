@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BioEngine.Extra.IPB
 {
-    public class BioEngineIPBModule : BioEngineModule
+    public class IPBModule : BioEngineModule
     {
         public override void ConfigureServices(WebHostBuilderContext context, IServiceCollection services)
         {
