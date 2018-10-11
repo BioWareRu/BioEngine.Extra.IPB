@@ -11,6 +11,7 @@ using BioEngine.Extra.IPB.Settings;
 using Flurl.Http;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -22,11 +23,13 @@ namespace BioEngine.Extra.IPB.Api
     {
         private readonly IOptions<IPBApiConfig> _options;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<IPBApiClient> _logger;
 
-        public IPBApiClientFactory(IOptions<IPBApiConfig> options, IServiceProvider serviceProvider)
+        public IPBApiClientFactory(IOptions<IPBApiConfig> options, IServiceProvider serviceProvider, ILogger<IPBApiClient> logger)
         {
             _options = options;
             _serviceProvider = serviceProvider;
+            _logger = logger;
         }
 
         public IPBApiClient GetClient(string token)
@@ -34,7 +37,7 @@ namespace BioEngine.Extra.IPB.Api
             var scopeServiceProvider = _serviceProvider.CreateScope().ServiceProvider;
             return new IPBApiClient(_options.Value, token,
                 scopeServiceProvider.GetRequiredService<SettingsProvider>(),
-                scopeServiceProvider.GetRequiredService<IContentRender>());
+                scopeServiceProvider.GetRequiredService<IContentRender>(), _logger);
         }
     }
 
@@ -44,14 +47,16 @@ namespace BioEngine.Extra.IPB.Api
         private readonly string _token;
         private readonly SettingsProvider _settingsProvider;
         private readonly IContentRender _contentRender;
+        private readonly ILogger<IPBApiClient> _logger;
 
         public IPBApiClient(IPBApiConfig apiConfig, string token, SettingsProvider settingsProvider,
-            IContentRender contentRender)
+            IContentRender contentRender, ILogger<IPBApiClient> logger)
         {
             _apiConfig = apiConfig;
             _token = token;
             _settingsProvider = settingsProvider;
             _contentRender = contentRender;
+            _logger = logger;
         }
 
         public Task<User> GetUser()
@@ -85,7 +90,7 @@ namespace BioEngine.Extra.IPB.Api
             }
             catch (FlurlHttpException ex)
             {
-                ex.ToString();
+                _logger.LogError(ex, ex.ToString());
                 throw;
             }
         }

@@ -9,12 +9,12 @@ namespace BioEngine.Extra.IPB.Controllers
     [ApiController]
     [Authorize]
     [Route("v1/ipb/[controller]")]
-    public class IPBContoller : Controller
+    public class IPBController : Controller
     {
         private readonly IPBApiClientFactory _factory;
         protected readonly ILogger Logger;
 
-        public IPBContoller(IPBApiClientFactory factory, ILogger logger)
+        public IPBController(IPBApiClientFactory factory, ILogger logger)
         {
             _factory = factory;
             Logger = logger;

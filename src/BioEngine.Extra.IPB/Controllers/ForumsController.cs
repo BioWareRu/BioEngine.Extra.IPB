@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BioEngine.Extra.IPB.Controllers
 {
-    public class ForumsController : IPBContoller
+    public class ForumsController : IPBController
     {
         public ForumsController(IPBApiClientFactory factory, ILogger<ForumsController> logger) : base(factory, logger)
         {
