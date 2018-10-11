@@ -1,0 +1,39 @@
+pool:
+  vmImage: 'Ubuntu 16.04'
+
+variables:
+  Version: '3.0.$(Build.BuildId)'
+
+steps:
+- task: DotNetCoreCLI@2
+  inputs:
+    command: restore
+    projects: '**/*.csproj'
+    feedsToUse: 'select'
+    verbosityRestore: 'minimal'
+    vstsFeed: 'BW'
+    
+- task: DotNetCoreCLI@2
+  inputs:
+    command: custom
+    custom: build
+    arguments: '--no-restore -c Release'
+    projects: '**/*.csproj'
+    
+- task: DotNetCoreCLI@2
+  inputs:
+    command: pack
+    nobuild: true
+    configuration: 'Release'
+    versioningScheme: byEnvVar
+    versionEnvVar: 'Version'
+    verbosityPack: 'minimal'
+    packDirectory: '$(build.artifactStagingDirectory)'
+    
+- task: DotNetCoreCLI@2
+  inputs:
+    command: push
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'BW'
+    versioningScheme: byEnvVar
+    versionEnvVar: 'Version'
