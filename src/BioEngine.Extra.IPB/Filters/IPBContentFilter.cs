@@ -33,7 +33,7 @@ namespace BioEngine.Extra.IPB.Filters
             return typeof(ContentItem).IsAssignableFrom(type);
         }
 
-        public override async Task<bool> AfterSave<T, TId>(T item)
+        public override async Task<bool> AfterSave<T, TId>(T item, PropertyChange[] changes = null)
         {
             var content = item as ContentItem;
 
