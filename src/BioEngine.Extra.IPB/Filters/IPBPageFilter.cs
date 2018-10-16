@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Helpers;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Providers;
+using BioEngine.Core.Settings;
 using BioEngine.Core.Site.Filters;
 using BioEngine.Core.Site.Model;
 using BioEngine.Extra.IPB.Api;
@@ -38,7 +38,7 @@ namespace BioEngine.Extra.IPB.Filters
 
         private IPBApiClient GetApiClient()
         {
-            return _apiClient ?? (_apiClient = _clientFactory.GetClient(_options.ReadOnlyKey));
+            return _apiClient ?? (_apiClient = _clientFactory.GetReadOnlyClient());
         }
 
 

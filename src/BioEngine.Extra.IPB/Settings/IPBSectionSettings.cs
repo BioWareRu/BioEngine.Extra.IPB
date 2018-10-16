@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Providers;
+using BioEngine.Core.Settings;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Models;
 using JetBrains.Annotations;

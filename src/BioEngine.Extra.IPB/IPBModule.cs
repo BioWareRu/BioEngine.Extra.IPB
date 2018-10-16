@@ -1,7 +1,7 @@
 using System;
 using BioEngine.Core.Interfaces;
 using BioEngine.Core.Modules;
-using BioEngine.Core.Providers;
+using BioEngine.Core.Settings;
 using BioEngine.Core.Site.Filters;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Filters;

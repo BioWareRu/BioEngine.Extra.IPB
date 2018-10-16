@@ -1,4 +1,4 @@
-using BioEngine.Core.Providers;
+using BioEngine.Core.Settings;
 
 namespace BioEngine.Extra.IPB.Settings
 {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Providers;
+using BioEngine.Core.Settings;
 using BioEngine.Extra.IPB.Models;
 using BioEngine.Extra.IPB.Settings;
 using Flurl.Http;
@@ -40,12 +40,20 @@ namespace BioEngine.Extra.IPB.Api
                 scopeServiceProvider.GetRequiredService<SettingsProvider>(),
                 scopeServiceProvider.GetService<IContentRender>(), _logger);
         }
+
+        public IPBApiClient GetReadOnlyClient()
+        {
+            var scopeServiceProvider = _serviceProvider.CreateScope().ServiceProvider;
+            return new IPBApiClient(_options.Value, null,
+                scopeServiceProvider.GetRequiredService<SettingsProvider>(),
+                scopeServiceProvider.GetService<IContentRender>(), _logger);
+        }
     }
 
     public class IPBApiClient
     {
         private readonly IPBConfig _config;
-        private readonly string _token;
+        [CanBeNull] private readonly string _token;
         private readonly SettingsProvider _settingsProvider;
         [CanBeNull] private readonly IContentRender _contentRender;
         private readonly ILogger<IPBApiClient> _logger;
@@ -67,7 +75,17 @@ namespace BioEngine.Extra.IPB.Api
 
         private IFlurlRequest GetRequest(string url)
         {
-            return $"{_config.ApiUrl}/{url}".WithOAuthBearerToken(_token).SetQueryParam("key", _token);
+            var requestUrl = new FlurlRequest($"{_config.ApiUrl}/{url}");
+            if (!string.IsNullOrEmpty(_token))
+            {
+                requestUrl.WithOAuthBearerToken(_token);
+            }
+            else
+            {
+                requestUrl.SetQueryParam("key", _config.ReadOnlyKey);
+            }
+
+            return requestUrl;
         }
 
 
