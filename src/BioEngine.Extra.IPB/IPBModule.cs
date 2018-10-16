@@ -2,6 +2,7 @@ using System;
 using BioEngine.Core.Interfaces;
 using BioEngine.Core.Modules;
 using BioEngine.Core.Providers;
+using BioEngine.Core.Site.Filters;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Filters;
 using BioEngine.Extra.IPB.Settings;
@@ -21,6 +22,11 @@ namespace BioEngine.Extra.IPB
 
     public class IPBSiteModule : IPBModule
     {
+        public override void ConfigureServices(WebHostBuilderContext context, IServiceCollection services)
+        {
+            base.ConfigureServices(context, services);
+            services.AddScoped<IPageFilter, IPBPageFilter>();
+        }
     }
 
     public class IPBApiModule : IPBModule

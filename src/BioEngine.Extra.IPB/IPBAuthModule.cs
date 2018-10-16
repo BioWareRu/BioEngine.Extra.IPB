@@ -1,3 +1,4 @@
+using System;
 using BioEngine.Core.Modules;
 using BioEngine.Extra.IPB.Auth;
 using Microsoft.AspNetCore.Builder;
@@ -13,11 +14,19 @@ namespace BioEngine.Extra.IPB
             services
                 .AddAuthentication("ipbToken")
                 .AddScheme<IPBTokenAuthOptions, TokenAuthenticationHandler>("ipbToken", null);
+            services.AddSingleton<IStartupFilter, IPBAuthStartupFilter>();
         }
+    }
 
-        public override void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    public class IPBAuthStartupFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
         {
-            app.UseAuthentication();
+            return app =>
+            {
+                app.UseAuthentication();
+                next(app);
+            };
         }
     }
 }
