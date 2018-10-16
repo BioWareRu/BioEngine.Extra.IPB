@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Helpers;
 using BioEngine.Core.Interfaces;
 using BioEngine.Core.Providers;
 using BioEngine.Core.Site.Filters;
 using BioEngine.Core.Site.Model;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Settings;
+using Huyn.PluralNet;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace BioEngine.Extra.IPB.Filters
@@ -18,14 +21,16 @@ namespace BioEngine.Extra.IPB.Filters
         private readonly SettingsProvider _settingsProvider;
         private readonly IPBApiClientFactory _clientFactory;
         private readonly IMemoryCache _memoryCache;
+        private readonly ILogger<IPBPageFilter> _logger;
         private readonly IPBConfig _options;
 
         public IPBPageFilter(SettingsProvider settingsProvider, IOptions<IPBConfig> options,
-            IPBApiClientFactory clientFactory, IMemoryCache memoryCache)
+            IPBApiClientFactory clientFactory, IMemoryCache memoryCache, ILogger<IPBPageFilter> logger)
         {
             _settingsProvider = settingsProvider;
             _clientFactory = clientFactory;
             _memoryCache = memoryCache;
+            _logger = logger;
             _options = options.Value;
         }
 
@@ -58,7 +63,7 @@ namespace BioEngine.Extra.IPB.Filters
                     var settings = await _settingsProvider.Get<IPBContentSettings>(entity);
                     if (settings.TopicId > 0)
                     {
-                        var url = new Uri($"{_options.Url}/topic/{settings.TopicId}/?do=getNewComment",
+                        var url = new Uri($"{_options.Url}topic/{settings.TopicId}/?do=getNewComment",
                             UriKind.Absolute);
 
                         viewModel.AddFeature(new IPBPageFeature(url, await GetCommentsCount(settings.TopicId)), entity);
@@ -75,12 +80,21 @@ namespace BioEngine.Extra.IPB.Filters
             var count = _memoryCache.Get<int?>(cacheKey);
             if (count == null)
             {
-                var topic = await GetApiClient().GetTopic(topicId);
-                count = topic.Posts - 1; // remove original topic post from comments count
+                try
+                {
+                    var topic = await GetApiClient().GetTopic(topicId);
+                    count = topic.Posts - 1; // remove original topic post from comments count
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, ex.ToString());
+                    count = null;
+                }
+
                 _memoryCache.Set(cacheKey, count, TimeSpan.FromMinutes(1));
             }
 
-            return count.Value;
+            return count ?? 0;
         }
     }
 
@@ -94,5 +108,16 @@ namespace BioEngine.Extra.IPB.Filters
 
         public Uri CommentsUrl { get; }
         public int CommentsCount { get; }
+
+        public string CommentsCountString =>
+            PluralizeHelper.Pluralize(CommentsCount,
+                new Dictionary<PluralTypeEnum, string>
+                {
+                    {PluralTypeEnum.ONE, "{0} комментарий"},
+                    {PluralTypeEnum.FEW, "{0} комментария"},
+                    {PluralTypeEnum.MANY, "{0} комментариев"},
+                    {PluralTypeEnum.OTHER, "{0} комментария"},
+                    {PluralTypeEnum.ZERO, "Обсудить на форуме"},
+                });
     }
 }
