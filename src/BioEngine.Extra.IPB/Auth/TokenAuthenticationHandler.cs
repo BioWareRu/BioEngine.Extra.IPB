@@ -17,14 +17,14 @@ namespace BioEngine.Extra.IPB.Auth
     [UsedImplicitly]
     public class TokenAuthenticationHandler : AuthenticationHandler<IPBTokenAuthOptions>
     {
-        private readonly IOptions<IPBApiConfig> _ipbApiOptions;
+        private readonly IOptions<IPBConfig> _ipbApiOptions;
         private readonly IPBApiClientFactory _apiClientFactory;
 
         private static readonly ConcurrentDictionary<string, User>
             TokenUsers = new ConcurrentDictionary<string, User>();
 
         public TokenAuthenticationHandler(IOptionsMonitor<IPBTokenAuthOptions> options, ILoggerFactory logger,
-            UrlEncoder encoder, ISystemClock clock, IOptions<IPBApiConfig> ipbApiOptions,
+            UrlEncoder encoder, ISystemClock clock, IOptions<IPBConfig> ipbApiOptions,
             IPBApiClientFactory apiClientFactory) : base(options, logger, encoder, clock)
         {
             _ipbApiOptions = ipbApiOptions;

@@ -6,18 +6,36 @@ using BioEngine.Core.Interfaces;
 using BioEngine.Core.Providers;
 using BioEngine.Core.Site.Filters;
 using BioEngine.Core.Site.Model;
+using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Settings;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace BioEngine.Extra.IPB.Filters
 {
     public class IPBPageFilter : IPageFilter
     {
         private readonly SettingsProvider _settingsProvider;
+        private readonly IPBApiClientFactory _clientFactory;
+        private readonly IMemoryCache _memoryCache;
+        private readonly IPBConfig _options;
 
-        public IPBPageFilter(SettingsProvider settingsProvider)
+        public IPBPageFilter(SettingsProvider settingsProvider, IOptions<IPBConfig> options,
+            IPBApiClientFactory clientFactory, IMemoryCache memoryCache)
         {
             _settingsProvider = settingsProvider;
+            _clientFactory = clientFactory;
+            _memoryCache = memoryCache;
+            _options = options.Value;
         }
+
+        private IPBApiClient _apiClient;
+
+        private IPBApiClient GetApiClient()
+        {
+            return _apiClient ?? (_apiClient = _clientFactory.GetClient(_options.ReadOnlyKey));
+        }
+
 
         public bool CanProcess(Type type)
         {
@@ -32,21 +50,37 @@ namespace BioEngine.Extra.IPB.Filters
         public async Task<bool> ProcessEntities<TEntity, TEntityPk>(PageViewModelContext viewModel,
             IEnumerable<TEntity> entities) where TEntity : class, IEntity<TEntityPk>
         {
-            var random = new Random();
             foreach (var entity in entities)
             {
                 var contentItem = entity as ContentItem;
                 if (contentItem != null)
                 {
                     var settings = await _settingsProvider.Get<IPBContentSettings>(entity);
-                    // TODO: DO REAL STUFF =)
-                    var url = new Uri($"/topic/{settings.TopicId}#{settings.PostId}", UriKind.Relative);
-                    var count = random.Next(1, 100);
-                    viewModel.AddFeature(new IPBPageFeature(url, count), entity);
+                    if (settings.TopicId > 0)
+                    {
+                        var url = new Uri($"{_options.Url}/topic/{settings.TopicId}/?do=getNewComment",
+                            UriKind.Absolute);
+
+                        viewModel.AddFeature(new IPBPageFeature(url, await GetCommentsCount(settings.TopicId)), entity);
+                    }
                 }
             }
 
             return true;
+        }
+
+        private async Task<int> GetCommentsCount(int topicId)
+        {
+            var cacheKey = $"ipbCommentsCount{topicId}";
+            var count = _memoryCache.Get<int?>(cacheKey);
+            if (count == null)
+            {
+                var topic = await GetApiClient().GetTopic(topicId);
+                count = topic.Posts - 1; // remove original topic post from comments count
+                _memoryCache.Set(cacheKey, count, TimeSpan.FromMinutes(1));
+            }
+
+            return count.Value;
         }
     }
 

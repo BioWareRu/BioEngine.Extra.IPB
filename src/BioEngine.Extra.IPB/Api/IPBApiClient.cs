@@ -21,11 +21,12 @@ namespace BioEngine.Extra.IPB.Api
     [UsedImplicitly]
     public class IPBApiClientFactory
     {
-        private readonly IOptions<IPBApiConfig> _options;
+        private readonly IOptions<IPBConfig> _options;
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<IPBApiClient> _logger;
 
-        public IPBApiClientFactory(IOptions<IPBApiConfig> options, IServiceProvider serviceProvider, ILogger<IPBApiClient> logger)
+        public IPBApiClientFactory(IOptions<IPBConfig> options, IServiceProvider serviceProvider,
+            ILogger<IPBApiClient> logger)
         {
             _options = options;
             _serviceProvider = serviceProvider;
@@ -37,22 +38,22 @@ namespace BioEngine.Extra.IPB.Api
             var scopeServiceProvider = _serviceProvider.CreateScope().ServiceProvider;
             return new IPBApiClient(_options.Value, token,
                 scopeServiceProvider.GetRequiredService<SettingsProvider>(),
-                scopeServiceProvider.GetRequiredService<IContentRender>(), _logger);
+                scopeServiceProvider.GetService<IContentRender>(), _logger);
         }
     }
 
     public class IPBApiClient
     {
-        private readonly IPBApiConfig _apiConfig;
+        private readonly IPBConfig _config;
         private readonly string _token;
         private readonly SettingsProvider _settingsProvider;
-        private readonly IContentRender _contentRender;
+        [CanBeNull] private readonly IContentRender _contentRender;
         private readonly ILogger<IPBApiClient> _logger;
 
-        public IPBApiClient(IPBApiConfig apiConfig, string token, SettingsProvider settingsProvider,
+        public IPBApiClient(IPBConfig config, string token, SettingsProvider settingsProvider,
             IContentRender contentRender, ILogger<IPBApiClient> logger)
         {
-            _apiConfig = apiConfig;
+            _config = config;
             _token = token;
             _settingsProvider = settingsProvider;
             _contentRender = contentRender;
@@ -66,7 +67,7 @@ namespace BioEngine.Extra.IPB.Api
 
         private IFlurlRequest GetRequest(string url)
         {
-            return $"{_apiConfig.ApiUrl}/{url}".WithOAuthBearerToken(_token);
+            return $"{_config.ApiUrl}/{url}".WithOAuthBearerToken(_token).SetQueryParam("key", _token);
         }
 
 
@@ -100,8 +101,18 @@ namespace BioEngine.Extra.IPB.Api
             return Get<Response<Forum>>($"forums/forums?page={page}&perPage={perPage}");
         }
 
+        public Task<Topic> GetTopic(int topicId)
+        {
+            return Get<Topic>($"forums/topics/{topicId}");
+        }
+
         public async Task<bool> CreateOrUpdateContentPost(ContentItem item, int forumId)
         {
+            if (_contentRender == null)
+            {
+                throw new ArgumentException("No content renderer is registered!");
+            }
+
             var contentSettings = await _settingsProvider.Get<IPBContentSettings>(item);
 
             if (contentSettings.TopicId == 0)
