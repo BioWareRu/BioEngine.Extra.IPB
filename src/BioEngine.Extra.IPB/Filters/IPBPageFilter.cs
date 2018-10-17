@@ -9,7 +9,6 @@ using BioEngine.Core.Site.Filters;
 using BioEngine.Core.Site.Model;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Settings;
-using Huyn.PluralNet;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -110,14 +109,12 @@ namespace BioEngine.Extra.IPB.Filters
         public int CommentsCount { get; }
 
         public string CommentsCountString =>
-            PluralizeHelper.Pluralize(CommentsCount,
-                new Dictionary<PluralTypeEnum, string>
-                {
-                    {PluralTypeEnum.ONE, "{0} комментарий"},
-                    {PluralTypeEnum.FEW, "{0} комментария"},
-                    {PluralTypeEnum.MANY, "{0} комментариев"},
-                    {PluralTypeEnum.OTHER, "{0} комментария"},
-                    {PluralTypeEnum.ZERO, "Обсудить на форуме"},
-                });
+            @"{n, plural,
+                    =0 {Обсудить на форуме}
+                    one {# комментарий} 
+                    few {# комментария} 
+                    many {# комментариев} 
+                    other {# комментария} 
+                }".Pluralize(CommentsCount);
     }
 }
