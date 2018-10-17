@@ -34,12 +34,12 @@ namespace BioEngine.Extra.IPB.Settings
             return settings is IPBSectionSettings;
         }
 
-        public async Task<List<SettingsOption>> Resolve(SettingsBase settings, string property)
+        public async Task<List<SettingsOption>> ResolveAsync(SettingsBase settings, string property)
         {
             switch (property)
             {
                 case "ForumId":
-                    var response = await _apiClient.GetForums(1, 1000);
+                    var response = await _apiClient.GetForumsAsync(1, 1000);
                     var roots = response.Results.Where(f => f.ParentId == null).ToList();
                     var forums = new List<Forum>();
                     foreach (var forum in roots)

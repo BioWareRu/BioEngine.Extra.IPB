@@ -16,10 +16,10 @@ namespace BioEngine.Extra.IPB.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ListResponse<Forum>>> Get(int offset = 1, int limit = 25)
+        public async Task<ActionResult<ListResponse<Forum>>> GetAsync(int offset = 1, int limit = 25)
         {
             var page = offset / limit + 1;
-            var response = await Client.GetForums(page, limit);
+            var response = await Client.GetForumsAsync(page, limit);
             var roots = response.Results.Where(f => f.ParentId == null).ToList();
             var forums = new List<Forum>();
             foreach (var forum in roots)

@@ -33,7 +33,7 @@ namespace BioEngine.Extra.IPB.Filters
             return typeof(ContentItem).IsAssignableFrom(type);
         }
 
-        public override async Task<bool> AfterSave<T, TId>(T item, PropertyChange[] changes = null)
+        public override async Task<bool> AfterSaveAsync<T, TId>(T item, PropertyChange[] changes = null)
         {
             var content = item as ContentItem;
 
@@ -46,7 +46,7 @@ namespace BioEngine.Extra.IPB.Filters
                         .FirstOrDefaultAsync();
                     if (section != null)
                     {
-                        var settings = await _settingsProvider.Get<IPBSectionSettings>(section);
+                        var settings = await _settingsProvider.GetAsync<IPBSectionSettings>(section);
 
                         forumId = settings.ForumId;
                     }
@@ -62,7 +62,7 @@ namespace BioEngine.Extra.IPB.Filters
                     return false;
                 }
 
-                return await _apiClient.CreateOrUpdateContentPost(content, forumId);
+                return await _apiClient.CreateOrUpdateContentPostAsync(content, forumId);
             }
 
             return true;

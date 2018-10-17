@@ -68,9 +68,9 @@ namespace BioEngine.Extra.IPB.Api
             _logger = logger;
         }
 
-        public Task<User> GetUser()
+        public Task<User> GetUserAsync()
         {
-            return Get<User>("core/me");
+            return GetAsync<User>("core/me");
         }
 
         private IFlurlRequest GetRequest(string url)
@@ -89,12 +89,12 @@ namespace BioEngine.Extra.IPB.Api
         }
 
 
-        private Task<T> Get<T>(string url)
+        private Task<T> GetAsync<T>(string url)
         {
             return GetRequest(url).GetJsonAsync<T>();
         }
 
-        private async Task<TResponse> Post<TRequest, TResponse>(string url, TRequest item)
+        private async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest item)
         {
             try
             {
@@ -114,24 +114,24 @@ namespace BioEngine.Extra.IPB.Api
             }
         }
 
-        public Task<Response<Forum>> GetForums(int page = 1, int perPage = 25)
+        public Task<Response<Forum>> GetForumsAsync(int page = 1, int perPage = 25)
         {
-            return Get<Response<Forum>>($"forums/forums?page={page}&perPage={perPage}");
+            return GetAsync<Response<Forum>>($"forums/forums?page={page}&perPage={perPage}");
         }
 
-        public Task<Topic> GetTopic(int topicId)
+        public Task<Topic> GetTopicAsync(int topicId)
         {
-            return Get<Topic>($"forums/topics/{topicId}");
+            return GetAsync<Topic>($"forums/topics/{topicId}");
         }
 
-        public async Task<bool> CreateOrUpdateContentPost(ContentItem item, int forumId)
+        public async Task<bool> CreateOrUpdateContentPostAsync(ContentItem item, int forumId)
         {
             if (_contentRender == null)
             {
                 throw new ArgumentException("No content renderer is registered!");
             }
 
-            var contentSettings = await _settingsProvider.Get<IPBContentSettings>(item);
+            var contentSettings = await _settingsProvider.GetAsync<IPBContentSettings>(item);
 
             if (contentSettings.TopicId == 0)
             {
@@ -141,15 +141,15 @@ namespace BioEngine.Extra.IPB.Api
                     Title = item.Title,
                     Hidden = !item.IsPublished ? 1 : 0,
                     Pinned = item.IsPinned ? 1 : 0,
-                    Post = await _contentRender.RenderHtml(item)
+                    Post = await _contentRender.RenderHtmlAsync(item)
                 };
-                var createdTopic = await Post<TopicCreateModel, Topic>("forums/topics", topic);
+                var createdTopic = await PostAsync<TopicCreateModel, Topic>("forums/topics", topic);
                 contentSettings.TopicId = createdTopic.Id;
                 contentSettings.PostId = createdTopic.FirstPost.Id;
             }
             else
             {
-                var topic = await Post<TopicCreateModel, Topic>($"forums/topics/{contentSettings.TopicId}",
+                var topic = await PostAsync<TopicCreateModel, Topic>($"forums/topics/{contentSettings.TopicId}",
                     new TopicCreateModel
                     {
                         Title = item.Title,
@@ -157,13 +157,13 @@ namespace BioEngine.Extra.IPB.Api
                         Pinned = item.IsPinned ? 1 : 0
                     });
 
-                await Post<PostCreateModel, Post>($"forums/posts/{topic.FirstPost.Id}", new PostCreateModel
+                await PostAsync<PostCreateModel, Post>($"forums/posts/{topic.FirstPost.Id}", new PostCreateModel
                 {
-                    Post = await _contentRender.RenderHtml(item)
+                    Post = await _contentRender.RenderHtmlAsync(item)
                 });
             }
 
-            await _settingsProvider.Set(contentSettings, item);
+            await _settingsProvider.SetAsync(contentSettings, item);
 
             return true;
         }

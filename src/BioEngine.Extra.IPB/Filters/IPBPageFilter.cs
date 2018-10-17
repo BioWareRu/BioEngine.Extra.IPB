@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
@@ -46,12 +46,12 @@ namespace BioEngine.Extra.IPB.Filters
             return typeof(ContentItem).IsAssignableFrom(type);
         }
 
-        public Task<bool> ProcessPage(PageViewModelContext viewModel)
+        public Task<bool> ProcessPageAsync(PageViewModelContext viewModel)
         {
             return Task.FromResult(true);
         }
 
-        public async Task<bool> ProcessEntities<TEntity, TEntityPk>(PageViewModelContext viewModel,
+        public async Task<bool> ProcessEntitiesAsync<TEntity, TEntityPk>(PageViewModelContext viewModel,
             IEnumerable<TEntity> entities) where TEntity : class, IEntity<TEntityPk>
         {
             foreach (var entity in entities)
@@ -59,13 +59,13 @@ namespace BioEngine.Extra.IPB.Filters
                 var contentItem = entity as ContentItem;
                 if (contentItem != null)
                 {
-                    var settings = await _settingsProvider.Get<IPBContentSettings>(entity);
+                    var settings = await _settingsProvider.GetAsync<IPBContentSettings>(entity);
                     if (settings.TopicId > 0)
                     {
                         var url = new Uri($"{_options.Url}topic/{settings.TopicId}/?do=getNewComment",
                             UriKind.Absolute);
 
-                        viewModel.AddFeature(new IPBPageFeature(url, await GetCommentsCount(settings.TopicId)), entity);
+                        viewModel.AddFeature(new IPBPageFeature(url, await GetCommentsCountAsync(settings.TopicId)), entity);
                     }
                 }
             }
@@ -73,7 +73,7 @@ namespace BioEngine.Extra.IPB.Filters
             return true;
         }
 
-        private async Task<int> GetCommentsCount(int topicId)
+        private async Task<int> GetCommentsCountAsync(int topicId)
         {
             var cacheKey = $"ipbCommentsCount{topicId}";
             var count = _memoryCache.Get<int?>(cacheKey);
@@ -81,7 +81,7 @@ namespace BioEngine.Extra.IPB.Filters
             {
                 try
                 {
-                    var topic = await GetApiClient().GetTopic(topicId);
+                    var topic = await GetApiClient().GetTopicAsync(topicId);
                     count = topic.Posts - 1; // remove original topic post from comments count
                 }
                 catch (Exception ex)

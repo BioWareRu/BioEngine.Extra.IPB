@@ -45,7 +45,7 @@ namespace BioEngine.Extra.IPB.Auth
                     if (!string.IsNullOrEmpty(tokenString))
                     {
                         if (_ipbApiOptions.Value.DevMode)
-                            return HandleAuthenticateDevAsync(tokenString);
+                            return HandleAuthenticateDev(tokenString);
                         var user = await GetUserAsync(tokenString);
                         if (user != null)
                         {
@@ -92,7 +92,7 @@ namespace BioEngine.Extra.IPB.Auth
             return userTicket;
         }
 
-        private AuthenticateResult HandleAuthenticateDevAsync(string token)
+        private AuthenticateResult HandleAuthenticateDev(string token)
         {
             var user = new User
             {
@@ -128,7 +128,7 @@ namespace BioEngine.Extra.IPB.Auth
         private async Task<User> GetUserInformationAsync(string token)
         {
             var apiClient = _apiClientFactory.GetClient(token);
-            return await apiClient.GetUser();
+            return await apiClient.GetUserAsync();
         }
     }
 
