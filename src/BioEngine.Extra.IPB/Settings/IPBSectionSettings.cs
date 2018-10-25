@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Interfaces;
 using BioEngine.Core.Settings;
+using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Models;
 using JetBrains.Annotations;

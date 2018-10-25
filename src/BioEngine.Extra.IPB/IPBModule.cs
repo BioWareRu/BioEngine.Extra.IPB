@@ -3,9 +3,11 @@ using BioEngine.Core.Interfaces;
 using BioEngine.Core.Modules;
 using BioEngine.Core.Settings;
 using BioEngine.Core.Site.Filters;
+using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Filters;
 using BioEngine.Extra.IPB.Settings;
+using BioEngine.Extra.IPB.Users;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -39,6 +41,7 @@ namespace BioEngine.Extra.IPB
                 config.ReadOnlyKey = builderContext.Configuration["BE_IPB_API_READONLY_KEY"];
             });
             services.AddSingleton<IPBApiClientFactory>();
+            services.AddScoped<IUserDataProvider, IPBUserDataProvider>();
         }
     }
 

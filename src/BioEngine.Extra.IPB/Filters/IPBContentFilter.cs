@@ -6,6 +6,7 @@ using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Settings;
+using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Settings;
 using Microsoft.AspNetCore.Http;
