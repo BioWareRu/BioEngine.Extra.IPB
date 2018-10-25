@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Helpers;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Settings;
+using BioEngine.Core.Properties;
 using BioEngine.Core.Site.Filters;
 using BioEngine.Core.Site.Model;
 using BioEngine.Extra.IPB.Api;
-using BioEngine.Extra.IPB.Settings;
+using BioEngine.Extra.IPB.Properties;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,16 +17,16 @@ namespace BioEngine.Extra.IPB.Filters
 {
     public class IPBPageFilter : IPageFilter
     {
-        private readonly SettingsProvider _settingsProvider;
+        private readonly PropertiesProvider _propertiesProvider;
         private readonly IPBApiClientFactory _clientFactory;
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger<IPBPageFilter> _logger;
         private readonly IPBConfig _options;
 
-        public IPBPageFilter(SettingsProvider settingsProvider, IOptions<IPBConfig> options,
+        public IPBPageFilter(PropertiesProvider propertiesProvider, IOptions<IPBConfig> options,
             IPBApiClientFactory clientFactory, IMemoryCache memoryCache, ILogger<IPBPageFilter> logger)
         {
-            _settingsProvider = settingsProvider;
+            _propertiesProvider = propertiesProvider;
             _clientFactory = clientFactory;
             _memoryCache = memoryCache;
             _logger = logger;
@@ -59,13 +59,13 @@ namespace BioEngine.Extra.IPB.Filters
                 var contentItem = entity as ContentItem;
                 if (contentItem != null)
                 {
-                    var settings = await _settingsProvider.GetAsync<IPBContentSettings>(entity);
-                    if (settings.TopicId > 0)
+                    var contentPropertiesSet = await _propertiesProvider.GetAsync<IPBContentPropertiesSet>(entity);
+                    if (contentPropertiesSet.TopicId > 0)
                     {
-                        var url = new Uri($"{_options.Url}topic/{settings.TopicId}/?do=getNewComment",
+                        var url = new Uri($"{_options.Url}topic/{contentPropertiesSet.TopicId}/?do=getNewComment",
                             UriKind.Absolute);
 
-                        viewModel.AddFeature(new IPBPageFeature(url, await GetCommentsCountAsync(settings.TopicId)), entity);
+                        viewModel.AddFeature(new IPBPageFeature(url, await GetCommentsCountAsync(contentPropertiesSet.TopicId)), entity);
                     }
                 }
             }

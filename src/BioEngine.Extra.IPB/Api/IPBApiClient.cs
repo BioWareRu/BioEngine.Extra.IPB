@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Settings;
+using BioEngine.Core.Properties;
 using BioEngine.Extra.IPB.Models;
-using BioEngine.Extra.IPB.Settings;
+using BioEngine.Extra.IPB.Properties;
 using Flurl.Http;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +37,7 @@ namespace BioEngine.Extra.IPB.Api
         {
             var scopeServiceProvider = _serviceProvider.CreateScope().ServiceProvider;
             return new IPBApiClient(_options.Value, token,
-                scopeServiceProvider.GetRequiredService<SettingsProvider>(),
+                scopeServiceProvider.GetRequiredService<PropertiesProvider>(),
                 scopeServiceProvider.GetService<IContentRender>(), _logger);
         }
 
@@ -45,7 +45,7 @@ namespace BioEngine.Extra.IPB.Api
         {
             var scopeServiceProvider = _serviceProvider.CreateScope().ServiceProvider;
             return new IPBApiClient(_options.Value, null,
-                scopeServiceProvider.GetRequiredService<SettingsProvider>(),
+                scopeServiceProvider.GetRequiredService<PropertiesProvider>(),
                 scopeServiceProvider.GetService<IContentRender>(), _logger);
         }
     }
@@ -54,16 +54,16 @@ namespace BioEngine.Extra.IPB.Api
     {
         private readonly IPBConfig _config;
         [CanBeNull] private readonly string _token;
-        private readonly SettingsProvider _settingsProvider;
+        private readonly PropertiesProvider _propertiesProvider;
         [CanBeNull] private readonly IContentRender _contentRender;
         private readonly ILogger<IPBApiClient> _logger;
 
-        public IPBApiClient(IPBConfig config, string token, SettingsProvider settingsProvider,
+        public IPBApiClient(IPBConfig config, string token, PropertiesProvider propertiesProvider,
             IContentRender contentRender, ILogger<IPBApiClient> logger)
         {
             _config = config;
             _token = token;
-            _settingsProvider = settingsProvider;
+            _propertiesProvider = propertiesProvider;
             _contentRender = contentRender;
             _logger = logger;
         }
@@ -136,9 +136,9 @@ namespace BioEngine.Extra.IPB.Api
                 throw new ArgumentException("No content renderer is registered!");
             }
 
-            var contentSettings = await _settingsProvider.GetAsync<IPBContentSettings>(item);
+            var contentPropertiesSet = await _propertiesProvider.GetAsync<IPBContentPropertiesSet>(item);
 
-            if (contentSettings.TopicId == 0)
+            if (contentPropertiesSet.TopicId == 0)
             {
                 var topic = new TopicCreateModel
                 {
@@ -149,12 +149,12 @@ namespace BioEngine.Extra.IPB.Api
                     Post = await _contentRender.RenderHtmlAsync(item)
                 };
                 var createdTopic = await PostAsync<TopicCreateModel, Topic>("forums/topics", topic);
-                contentSettings.TopicId = createdTopic.Id;
-                contentSettings.PostId = createdTopic.FirstPost.Id;
+                contentPropertiesSet.TopicId = createdTopic.Id;
+                contentPropertiesSet.PostId = createdTopic.FirstPost.Id;
             }
             else
             {
-                var topic = await PostAsync<TopicCreateModel, Topic>($"forums/topics/{contentSettings.TopicId}",
+                var topic = await PostAsync<TopicCreateModel, Topic>($"forums/topics/{contentPropertiesSet.TopicId}",
                     new TopicCreateModel
                     {
                         Title = item.Title,
@@ -168,7 +168,7 @@ namespace BioEngine.Extra.IPB.Api
                 });
             }
 
-            await _settingsProvider.SetAsync(contentSettings, item);
+            await _propertiesProvider.SetAsync(contentPropertiesSet, item);
 
             return true;
         }

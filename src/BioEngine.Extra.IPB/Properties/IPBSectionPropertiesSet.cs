@@ -1,41 +1,40 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.Interfaces;
-using BioEngine.Core.Settings;
+using BioEngine.Core.Properties;
 using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Models;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
-namespace BioEngine.Extra.IPB.Settings
+namespace BioEngine.Extra.IPB.Properties
 {
-    [SettingsClass(Name = "Публикация на форуме", IsEditable = true)]
-    public class IPBSectionSettings : SettingsBase
+    [PropertiesSet(Name = "Публикация на форуме", IsEditable = true)]
+    public class IPBSectionPropertiesSet : PropertiesSet
     {
-        [SettingsProperty(Name = "Раздел на форуме", Type = SettingType.Dropdown)]
+        [PropertiesElement(Name = "Раздел на форуме", Type = PropertyElementType.Dropdown)]
         public int ForumId { get; set; }
     }
 
     [UsedImplicitly]
-    public class IPBSectionSettingsOptionsResolver : ISettingsOptionsResolver
+    public class IPBSectionPropertiesOptionsResolver : IPropertiesOptionsResolver
     {
-        private IPBApiClient _apiClient;
+        private readonly IPBApiClient _apiClient;
 
-        public IPBSectionSettingsOptionsResolver(IPBApiClientFactory apiClientFactory,
+        public IPBSectionPropertiesOptionsResolver(IPBApiClientFactory apiClientFactory,
             IHttpContextAccessor httpContextAccessor)
         {
             _apiClient =
                 apiClientFactory.GetClient(httpContextAccessor.HttpContext.Features.Get<ICurrentUserFeature>().Token);
         }
 
-        public bool CanResolve(SettingsBase settings)
+        public bool CanResolve(PropertiesSet properties)
         {
-            return settings is IPBSectionSettings;
+            return properties is IPBSectionPropertiesSet;
         }
 
-        public async Task<List<SettingsOption>> ResolveAsync(SettingsBase settings, string property)
+        public async Task<List<PropertiesOption>> ResolveAsync(PropertiesSet properties, string property)
         {
             switch (property)
             {
@@ -48,7 +47,7 @@ namespace BioEngine.Extra.IPB.Settings
                         FillTree(forum, forums, response.Results.ToList());
                     }
 
-                    return forums.Select(f => new SettingsOption(f.FullName, f.Id, f.Category)).ToList();
+                    return forums.Select(f => new PropertiesOption(f.FullName, f.Id, f.Category)).ToList();
                 default: return null;
             }
         }

@@ -3,12 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Interfaces;
+using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
-using BioEngine.Core.Settings;
 using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
-using BioEngine.Extra.IPB.Settings;
+using BioEngine.Extra.IPB.Properties;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,15 +16,15 @@ namespace BioEngine.Extra.IPB.Filters
     public class IPBContentFilter : BaseRepositoryFilter
     {
         private readonly IPBApiClient _apiClient;
-        private readonly SettingsProvider _settingsProvider;
+        private readonly PropertiesProvider _propertiesProvider;
         private readonly BioContext _bioContext;
 
         public IPBContentFilter(IPBApiClientFactory apiClientFactory, IHttpContextAccessor httpContextAccessor,
-            SettingsProvider settingsProvider, BioContext bioContext)
+            PropertiesProvider propertiesProvider, BioContext bioContext)
         {
             _apiClient =
                 apiClientFactory.GetClient(httpContextAccessor.HttpContext.Features.Get<ICurrentUserFeature>().Token);
-            _settingsProvider = settingsProvider;
+            _propertiesProvider = propertiesProvider;
             _bioContext = bioContext;
         }
 
@@ -47,14 +46,14 @@ namespace BioEngine.Extra.IPB.Filters
                         .FirstOrDefaultAsync();
                     if (section != null)
                     {
-                        var settings = await _settingsProvider.GetAsync<IPBSectionSettings>(section);
+                        var sectionPropertiesSet = await _propertiesProvider.GetAsync<IPBSectionPropertiesSet>(section);
 
-                        forumId = settings.ForumId;
+                        forumId = sectionPropertiesSet.ForumId;
                     }
                 }
                 else
                 {
-                    // some forum id from setting
+                    // some forum id from site properties?
                     forumId = 0;
                 }
 

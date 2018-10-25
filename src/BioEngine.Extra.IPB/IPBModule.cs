@@ -1,12 +1,12 @@
 using System;
 using BioEngine.Core.Interfaces;
 using BioEngine.Core.Modules;
-using BioEngine.Core.Settings;
+using BioEngine.Core.Properties;
 using BioEngine.Core.Site.Filters;
 using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Filters;
-using BioEngine.Extra.IPB.Settings;
+using BioEngine.Extra.IPB.Properties;
 using BioEngine.Extra.IPB.Users;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,8 +17,8 @@ namespace BioEngine.Extra.IPB
     {
         public override void ConfigureServices(WebHostBuilderContext builderContext, IServiceCollection services)
         {
-            SettingsProvider.RegisterBioEngineSectionSettings<IPBSectionSettings>();
-            SettingsProvider.RegisterBioEngineContentSettings<IPBContentSettings>();
+            PropertiesProvider.RegisterBioEngineSectionProperties<IPBSectionPropertiesSet>();
+            PropertiesProvider.RegisterBioEngineContentProperties<IPBContentPropertiesSet>();
 
             bool.TryParse(builderContext.Configuration["BE_IPB_API_DEV_MODE"] ?? "", out var devMode);
             int.TryParse(builderContext.Configuration["BE_IPB_API_ADMIN_GROUP_ID"], out var adminGroupId);
@@ -62,7 +62,7 @@ namespace BioEngine.Extra.IPB
 
             services.AddMvc().AddApplicationPart(typeof(WebHostBuilderExtensions).Assembly);
             services.AddScoped<IRepositoryFilter, IPBContentFilter>();
-            services.AddScoped<ISettingsOptionsResolver, IPBSectionSettingsOptionsResolver>();
+            services.AddScoped<IPropertiesOptionsResolver, IPBSectionPropertiesOptionsResolver>();
         }
     }
 }
