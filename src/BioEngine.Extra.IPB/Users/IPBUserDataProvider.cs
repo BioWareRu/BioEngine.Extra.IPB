@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BioEngine.Core.Interfaces;
 using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
 using Microsoft.Extensions.Caching.Memory;
@@ -28,38 +28,31 @@ namespace BioEngine.Extra.IPB.Users
             return $"ipbuserdata{userId}";
         }
 
-        private List<UserData> GetFromCache(IEnumerable<int> userIds)
+        private List<IUser> GetFromCache(IEnumerable<int> userIds)
         {
             _logger.LogTrace("Get user data from cache");
-            return userIds.Select(GetCacheKey).Select(key => _memoryCache.Get<UserData>(key))
+            return userIds.Select(GetCacheKey).Select(key => _memoryCache.Get<IUser>(key))
                 .Where(userData => userData != null).ToList();
         }
 
-        public async Task<List<UserData>> GetDataAsync(int[] userIds)
+        public async Task<List<IUser>> GetDataAsync(int[] userIds)
         {
             var data = GetFromCache(userIds);
-            var notFoundUserIds = userIds.Where(id => data.All(ud => ud.Id != id)).ToArray();
+            var notFoundUserIds = userIds.Where(id => data.All(ud => ud.Id != id) && id > 0).ToArray();
             if (notFoundUserIds.Length > 0)
             {
                 _logger.LogTrace("Load users data from api");
                 var tasks = notFoundUserIds.Select(id => GetApiClient().GetUserByIdAsync(id));
                 var users = await Task.WhenAll(tasks);
-                var userData = users.Select(user => new UserData
-                {
-                    Id = user.Id,
-                    Name = user.Name,
-                    ProfileLink = new Uri(user.ProfileUrl),
-                    AvatarLink = new Uri(user.PhotoUrl)
-                }).ToList();
-                SetToCache(userData);
-                data.AddRange(userData);
+                SetToCache(users);
+                data.AddRange(users);
             }
 
             _logger.LogTrace("User data loaded");
             return data;
         }
 
-        private void SetToCache(IEnumerable<UserData> userData)
+        private void SetToCache(IEnumerable<IUser> userData)
         {
             _logger.LogTrace("Set user data to cache");
             foreach (var data in userData)
