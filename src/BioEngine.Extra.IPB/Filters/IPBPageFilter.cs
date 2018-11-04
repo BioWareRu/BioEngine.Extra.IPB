@@ -65,7 +65,7 @@ namespace BioEngine.Extra.IPB.Filters
                         var url = new Uri($"{_options.Url}topic/{contentPropertiesSet.TopicId}/?do=getNewComment",
                             UriKind.Absolute);
 
-                        viewModel.AddFeature(new IPBPageFeature(url, await GetCommentsCountAsync(contentPropertiesSet.TopicId)), entity);
+                        viewModel.PageFeaturesCollection.AddFeature(new IPBPageFeature(url, await GetCommentsCountAsync(contentPropertiesSet.TopicId)), entity);
                     }
                 }
             }
