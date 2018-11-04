@@ -11,7 +11,7 @@ steps:
     projects: '**/*.csproj'
     feedsToUse: 'select'
     verbosityRestore: 'minimal'
-    vstsFeed: 'BW'
+    vstsFeed: 'BioEngine'
     
 - task: DotNetCoreCLI@2
   inputs:
@@ -34,6 +34,6 @@ steps:
   inputs:
     command: push
     nuGetFeedType: 'internal'
-    publishVstsFeed: 'BW'
+    publishVstsFeed: 'BioEngine'
     versioningScheme: byEnvVar
     versionEnvVar: 'Version'
