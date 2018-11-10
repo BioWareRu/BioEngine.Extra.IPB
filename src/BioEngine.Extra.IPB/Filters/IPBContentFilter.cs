@@ -30,12 +30,12 @@ namespace BioEngine.Extra.IPB.Filters
 
         public override bool CanProcess(Type type)
         {
-            return typeof(ContentItem).IsAssignableFrom(type);
+            return typeof(Post).IsAssignableFrom(type);
         }
 
         public override async Task<bool> AfterSaveAsync<T, TId>(T item, PropertyChange[] changes = null)
         {
-            var content = item as ContentItem;
+            var content = item as Post;
 
             if (content != null)
             {
