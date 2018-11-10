@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Post = BioEngine.Core.Entities.Post;
 
 namespace BioEngine.Extra.IPB.Api
 {
@@ -129,7 +130,7 @@ namespace BioEngine.Extra.IPB.Api
             return GetAsync<Topic>($"forums/topics/{topicId}");
         }
 
-        public async Task<bool> CreateOrUpdateContentPostAsync(ContentItem item, int forumId)
+        public async Task<bool> CreateOrUpdateContentPostAsync(Post item, int forumId)
         {
             if (_contentRender == null)
             {
@@ -162,7 +163,7 @@ namespace BioEngine.Extra.IPB.Api
                         Pinned = item.IsPinned ? 1 : 0
                     });
 
-                await PostAsync<PostCreateModel, Post>($"forums/posts/{topic.FirstPost.Id}", new PostCreateModel
+                await PostAsync<PostCreateModel, Models.Post>($"forums/posts/{topic.FirstPost.Id}", new PostCreateModel
                 {
                     Post = await _contentRender.RenderHtmlAsync(item)
                 });

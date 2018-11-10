@@ -43,7 +43,7 @@ namespace BioEngine.Extra.IPB.Filters
 
         public bool CanProcess(Type type)
         {
-            return typeof(ContentItem).IsAssignableFrom(type);
+            return typeof(Post).IsAssignableFrom(type);
         }
 
         public Task<bool> ProcessPageAsync(PageViewModelContext viewModel)
@@ -56,7 +56,7 @@ namespace BioEngine.Extra.IPB.Filters
         {
             foreach (var entity in entities)
             {
-                var contentItem = entity as ContentItem;
+                var contentItem = entity as Post;
                 if (contentItem != null)
                 {
                     var contentPropertiesSet = await _propertiesProvider.GetAsync<IPBContentPropertiesSet>(entity);
