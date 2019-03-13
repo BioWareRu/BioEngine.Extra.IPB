@@ -9,24 +9,25 @@ using BioEngine.Extra.IPB.Filters;
 using BioEngine.Extra.IPB.Properties;
 using BioEngine.Extra.IPB.Users;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BioEngine.Extra.IPB
 {
     public abstract class IPBModule : BioEngineModule
     {
-        public override void ConfigureServices(WebHostBuilderContext builderContext, IServiceCollection services)
+        public override void ConfigureServices(IServiceCollection services, IConfiguration configuration, IHostingEnvironment environment)
         {
             PropertiesProvider.RegisterBioEngineSectionProperties<IPBSectionPropertiesSet>();
             PropertiesProvider.RegisterBioEngineContentProperties<IPBContentPropertiesSet>();
 
-            bool.TryParse(builderContext.Configuration["BE_IPB_API_DEV_MODE"] ?? "", out var devMode);
-            int.TryParse(builderContext.Configuration["BE_IPB_API_ADMIN_GROUP_ID"], out var adminGroupId);
-            int.TryParse(builderContext.Configuration["BE_IPB_API_PUBLISHER_GROUP_ID"], out var publisherGroupId);
-            int.TryParse(builderContext.Configuration["BE_IPB_API_EDITOR_GROUP_ID"], out var editorGroupId);
-            if (!Uri.TryCreate(builderContext.Configuration["BE_IPB_URL"], UriKind.Absolute, out var ipbUrl))
+            bool.TryParse(configuration["BE_IPB_API_DEV_MODE"] ?? "", out var devMode);
+            int.TryParse(configuration["BE_IPB_API_ADMIN_GROUP_ID"], out var adminGroupId);
+            int.TryParse(configuration["BE_IPB_API_PUBLISHER_GROUP_ID"], out var publisherGroupId);
+            int.TryParse(configuration["BE_IPB_API_EDITOR_GROUP_ID"], out var editorGroupId);
+            if (!Uri.TryCreate(configuration["BE_IPB_URL"], UriKind.Absolute, out var ipbUrl))
             {
-                throw new ArgumentException($"Can't parse IPB url; {builderContext.Configuration["BE_IPB_URL"]}");
+                throw new ArgumentException($"Can't parse IPB url; {configuration["BE_IPB_URL"]}");
             }
 
             services.Configure<IPBConfig>(config =>
@@ -37,8 +38,8 @@ namespace BioEngine.Extra.IPB
                 config.AdminGroupId = adminGroupId;
                 config.PublisherGroupId = publisherGroupId;
                 config.EditorGroupId = editorGroupId;
-                config.ClientId = builderContext.Configuration["BE_IPB_API_CLIENT_ID"];
-                config.ReadOnlyKey = builderContext.Configuration["BE_IPB_API_READONLY_KEY"];
+                config.ClientId = configuration["BE_IPB_API_CLIENT_ID"];
+                config.ReadOnlyKey = configuration["BE_IPB_API_READONLY_KEY"];
             });
             services.AddSingleton<IPBApiClientFactory>();
             services.AddScoped<IUserDataProvider, IPBUserDataProvider>();
@@ -47,18 +48,18 @@ namespace BioEngine.Extra.IPB
 
     public class IPBSiteModule : IPBModule
     {
-        public override void ConfigureServices(WebHostBuilderContext builderContext, IServiceCollection services)
+        public override void ConfigureServices(IServiceCollection services, IConfiguration configuration, IHostingEnvironment environment)
         {
-            base.ConfigureServices(builderContext, services);
+            base.ConfigureServices(services, configuration, environment);
             services.AddScoped<IPageFilter, IPBPageFilter>();
         }
     }
 
     public class IPBApiModule : IPBModule
     {
-        public override void ConfigureServices(WebHostBuilderContext builderContext, IServiceCollection services)
+        public override void ConfigureServices(IServiceCollection services, IConfiguration configuration, IHostingEnvironment environment)
         {
-            base.ConfigureServices(builderContext, services);
+            base.ConfigureServices(services, configuration, environment);
 
             services.AddMvc().AddApplicationPart(typeof(WebHostBuilderExtensions).Assembly);
             services.AddScoped<IRepositoryFilter, IPBContentFilter>();
