@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
 using BioEngine.Core.Properties;
 using BioEngine.Extra.IPB.Models;

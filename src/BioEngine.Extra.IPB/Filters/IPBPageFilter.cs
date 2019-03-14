@@ -51,8 +51,8 @@ namespace BioEngine.Extra.IPB.Filters
             return Task.FromResult(true);
         }
 
-        public async Task<bool> ProcessEntitiesAsync<TEntity, TEntityPk>(PageViewModelContext viewModel,
-            IEnumerable<TEntity> entities) where TEntity : class, IEntity<TEntityPk>
+        public async Task<bool> ProcessEntitiesAsync<TEntity>(PageViewModelContext viewModel,
+            IEnumerable<TEntity> entities) where TEntity : class, IEntity
         {
             foreach (var entity in entities)
             {
