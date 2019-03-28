@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.Interfaces;
 using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
 using Microsoft.Extensions.Caching.Memory;

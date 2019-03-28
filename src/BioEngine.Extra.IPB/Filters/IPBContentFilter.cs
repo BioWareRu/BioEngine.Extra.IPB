@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Interfaces;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Users;

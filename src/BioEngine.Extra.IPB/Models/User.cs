@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BioEngine.Core.Interfaces;
+using BioEngine.Core.Users;
 
 namespace BioEngine.Extra.IPB.Models
 {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Helpers;
-using BioEngine.Core.Interfaces;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Site.Filters;
 using BioEngine.Core.Site.Model;
