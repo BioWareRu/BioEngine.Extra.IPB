@@ -62,7 +62,7 @@ namespace BioEngine.Extra.IPB
             base.ConfigureServices(services, configuration, environment);
 
             services.AddMvc().AddApplicationPart(typeof(WebHostBuilderExtensions).Assembly);
-            services.AddScoped<IRepositoryFilter, IPBContentFilter>();
+            services.AddScoped<IRepositoryHook, IPBContentHook>();
             services.AddScoped<IPropertiesOptionsResolver, IPBSectionPropertiesOptionsResolver>();
         }
     }

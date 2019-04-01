@@ -13,13 +13,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioEngine.Extra.IPB.Filters
 {
-    public class IPBContentFilter : BaseRepositoryFilter
+    public class IPBContentHook : BaseRepositoryHook
     {
         private readonly IPBApiClient _apiClient;
         private readonly PropertiesProvider _propertiesProvider;
         private readonly BioContext _bioContext;
 
-        public IPBContentFilter(IPBApiClientFactory apiClientFactory, IHttpContextAccessor httpContextAccessor,
+        public IPBContentHook(IPBApiClientFactory apiClientFactory, IHttpContextAccessor httpContextAccessor,
             PropertiesProvider propertiesProvider, BioContext bioContext)
         {
             _apiClient =
