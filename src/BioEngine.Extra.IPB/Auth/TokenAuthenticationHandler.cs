@@ -62,7 +62,7 @@ namespace BioEngine.Extra.IPB.Auth
             }
 
             stopwatch.Stop();
-            Logger.LogWarning($"Auth process: {stopwatch.ElapsedMilliseconds}");
+            Logger.LogWarning("Auth process: {time}", stopwatch.ElapsedMilliseconds);
             return result;
         }
 
@@ -100,10 +100,7 @@ namespace BioEngine.Extra.IPB.Auth
                 Name = "Sonic",
                 PhotoUrl = "/assets/img/avatar.png",
                 ProfileUrl = "#",
-                PrimaryGroup = new Group
-                {
-                    Id = _ipbApiOptions.Value.AdminGroupId
-                }
+                PrimaryGroup = new Group {Id = _ipbApiOptions.Value.AdminGroupId}
             };
             var userTicket = AuthenticationTicket(user);
             Context.Features.Set<ICurrentUserFeature>(new CurrentUserFeature(user, token));

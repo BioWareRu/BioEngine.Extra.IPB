@@ -61,7 +61,7 @@ namespace BioEngine.Extra.IPB.Filters
                     var contentPropertiesSet = await _propertiesProvider.GetAsync<IPBContentPropertiesSet>(entity);
                     if (contentPropertiesSet.TopicId > 0)
                     {
-                        var url = new Uri($"{_options.Url}topic/{contentPropertiesSet.TopicId}/?do=getNewComment",
+                        var url = new Uri($"{_options.Url}topic/{contentPropertiesSet.TopicId.ToString()}/?do=getNewComment",
                             UriKind.Absolute);
 
                         viewModel.PageFeaturesCollection.AddFeature(new IPBPageFeature(url, await GetCommentsCountAsync(contentPropertiesSet.TopicId)), entity);
@@ -74,7 +74,7 @@ namespace BioEngine.Extra.IPB.Filters
 
         private async Task<int> GetCommentsCountAsync(int topicId)
         {
-            var cacheKey = $"ipbCommentsCount{topicId}";
+            var cacheKey = $"ipbCommentsCount{topicId.ToString()}";
             var count = _memoryCache.Get<int?>(cacheKey);
             if (count == null)
             {

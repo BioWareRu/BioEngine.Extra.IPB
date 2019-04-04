@@ -116,17 +116,17 @@ namespace BioEngine.Extra.IPB.Api
 
         public Task<Response<Forum>> GetForumsAsync(int page = 1, int perPage = 25)
         {
-            return GetAsync<Response<Forum>>($"forums/forums?page={page}&perPage={perPage}");
+            return GetAsync<Response<Forum>>($"forums/forums?page={page.ToString()}&perPage={perPage.ToString()}");
         }
 
         public Task<User> GetUserByIdAsync(int id)
         {
-            return GetAsync<User>($"core/members/{id}");
+            return GetAsync<User>($"core/members/{id.ToString()}");
         }
 
         public Task<Topic> GetTopicAsync(int topicId)
         {
-            return GetAsync<Topic>($"forums/topics/{topicId}");
+            return GetAsync<Topic>($"forums/topics/{topicId.ToString()}");
         }
 
         public async Task<bool> CreateOrUpdateContentPostAsync(Post item, int forumId)
@@ -154,7 +154,7 @@ namespace BioEngine.Extra.IPB.Api
             }
             else
             {
-                var topic = await PostAsync<TopicCreateModel, Topic>($"forums/topics/{contentPropertiesSet.TopicId}",
+                var topic = await PostAsync<TopicCreateModel, Topic>($"forums/topics/{contentPropertiesSet.TopicId.ToString()}",
                     new TopicCreateModel
                     {
                         Title = item.Title,
@@ -162,7 +162,7 @@ namespace BioEngine.Extra.IPB.Api
                         Pinned = item.IsPinned ? 1 : 0
                     });
 
-                await PostAsync<PostCreateModel, Models.Post>($"forums/posts/{topic.FirstPost.Id}", new PostCreateModel
+                await PostAsync<PostCreateModel, Models.Post>($"forums/posts/{topic.FirstPost.Id.ToString()}", new PostCreateModel
                 {
                     Post = await _contentRender.RenderHtmlAsync(item)
                 });

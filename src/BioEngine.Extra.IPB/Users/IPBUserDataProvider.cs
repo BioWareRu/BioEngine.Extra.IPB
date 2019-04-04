@@ -24,7 +24,7 @@ namespace BioEngine.Extra.IPB.Users
 
         private static string GetCacheKey(int userId)
         {
-            return $"ipbuserdata{userId}";
+            return $"ipbuserdata{userId.ToString()}";
         }
 
         private List<IUser> GetFromCache(IEnumerable<int> userIds)
