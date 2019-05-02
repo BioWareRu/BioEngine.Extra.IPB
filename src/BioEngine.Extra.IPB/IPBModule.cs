@@ -18,8 +18,8 @@ namespace BioEngine.Extra.IPB
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration, IHostingEnvironment environment)
         {
-            PropertiesProvider.RegisterBioEngineSectionProperties<IPBSectionPropertiesSet>();
-            PropertiesProvider.RegisterBioEngineContentProperties<IPBContentPropertiesSet>();
+            PropertiesProvider.RegisterBioEngineSectionProperties<IPBSectionPropertiesSet>("ipbsection");
+            PropertiesProvider.RegisterBioEngineContentProperties<IPBContentPropertiesSet>("ipbcontent");
 
             bool.TryParse(configuration["BE_IPB_API_DEV_MODE"] ?? "", out var devMode);
             int.TryParse(configuration["BE_IPB_API_ADMIN_GROUP_ID"], out var adminGroupId);

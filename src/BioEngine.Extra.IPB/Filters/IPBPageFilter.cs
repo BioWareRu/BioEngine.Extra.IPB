@@ -56,10 +56,9 @@ namespace BioEngine.Extra.IPB.Filters
         {
             foreach (var entity in entities)
             {
-                var contentItem = entity as Post;
-                if (contentItem != null)
+                if (entity is Post contentItem)
                 {
-                    var contentPropertiesSet = await _propertiesProvider.GetAsync<IPBContentPropertiesSet>(entity);
+                    var contentPropertiesSet = await _propertiesProvider.GetAsync<IPBContentPropertiesSet>(contentItem);
                     if (contentPropertiesSet.TopicId > 0)
                     {
                         var url = new Uri(
@@ -67,7 +66,7 @@ namespace BioEngine.Extra.IPB.Filters
                             UriKind.Absolute);
 
                         viewModel.PageFeaturesCollection.AddFeature<ICommentsCountFeature>(
-                            new IPBPageFeature(url, await GetCommentsCountAsync(contentPropertiesSet.TopicId)), entity);
+                            new IPBPageFeature(url, await GetCommentsCountAsync(contentPropertiesSet.TopicId)), contentItem);
                     }
                 }
             }
