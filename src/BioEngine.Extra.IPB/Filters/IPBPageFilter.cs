@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Helpers;
 using BioEngine.Core.Properties;
+using BioEngine.Core.Site.Features;
 using BioEngine.Core.Site.Filters;
 using BioEngine.Core.Site.Model;
 using BioEngine.Extra.IPB.Api;
@@ -61,10 +62,12 @@ namespace BioEngine.Extra.IPB.Filters
                     var contentPropertiesSet = await _propertiesProvider.GetAsync<IPBContentPropertiesSet>(entity);
                     if (contentPropertiesSet.TopicId > 0)
                     {
-                        var url = new Uri($"{_options.Url}topic/{contentPropertiesSet.TopicId.ToString()}/?do=getNewComment",
+                        var url = new Uri(
+                            $"{_options.Url}topic/{contentPropertiesSet.TopicId.ToString()}/?do=getNewComment",
                             UriKind.Absolute);
 
-                        viewModel.PageFeaturesCollection.AddFeature(new IPBPageFeature(url, await GetCommentsCountAsync(contentPropertiesSet.TopicId)), entity);
+                        viewModel.PageFeaturesCollection.AddFeature<ICommentsCountFeature>(
+                            new IPBPageFeature(url, await GetCommentsCountAsync(contentPropertiesSet.TopicId)), entity);
                     }
                 }
             }
@@ -96,7 +99,7 @@ namespace BioEngine.Extra.IPB.Filters
         }
     }
 
-    public class IPBPageFeature
+    public class IPBPageFeature : ICommentsCountFeature
     {
         public IPBPageFeature(Uri commentsUrl, int commentsCount)
         {
