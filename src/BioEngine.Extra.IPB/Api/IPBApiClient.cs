@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.Properties;
+using BioEngine.Core.DB;
 using BioEngine.Core.Web;
+using BioEngine.Extra.IPB.Entities;
 using BioEngine.Extra.IPB.Models;
-using BioEngine.Extra.IPB.Properties;
 using Flurl.Http;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -37,7 +38,7 @@ namespace BioEngine.Extra.IPB.Api
         {
             var scopeServiceProvider = _serviceProvider.CreateScope().ServiceProvider;
             return new IPBApiClient(_options.Value, token,
-                scopeServiceProvider.GetRequiredService<PropertiesProvider>(),
+                scopeServiceProvider.GetRequiredService<BioContext>(),
                 scopeServiceProvider.GetService<IContentRender>(), _logger);
         }
 
@@ -45,7 +46,7 @@ namespace BioEngine.Extra.IPB.Api
         {
             var scopeServiceProvider = _serviceProvider.CreateScope().ServiceProvider;
             return new IPBApiClient(_options.Value, null,
-                scopeServiceProvider.GetRequiredService<PropertiesProvider>(),
+                scopeServiceProvider.GetRequiredService<BioContext>(),
                 scopeServiceProvider.GetService<IContentRender>(), _logger);
         }
     }
@@ -54,16 +55,16 @@ namespace BioEngine.Extra.IPB.Api
     {
         private readonly IPBConfig _config;
         [CanBeNull] private readonly string _token;
-        private readonly PropertiesProvider _propertiesProvider;
+        private readonly BioContext _dbContext;
         [CanBeNull] private readonly IContentRender _contentRender;
         private readonly ILogger<IPBApiClient> _logger;
 
-        public IPBApiClient(IPBConfig config, string token, PropertiesProvider propertiesProvider,
+        public IPBApiClient(IPBConfig config, string token, BioContext dbContext,
             IContentRender contentRender, ILogger<IPBApiClient> logger)
         {
             _config = config;
             _token = token;
-            _propertiesProvider = propertiesProvider;
+            _dbContext = dbContext;
             _contentRender = contentRender;
             _logger = logger;
         }
@@ -136,9 +137,15 @@ namespace BioEngine.Extra.IPB.Api
                 throw new ArgumentException("No content renderer is registered!");
             }
 
-            var contentPropertiesSet = await _propertiesProvider.GetAsync<IPBContentPropertiesSet>(item);
+            //var contentPropertiesSet = await _propertiesProvider.GetAsync<IPBContentPropertiesSet>(item);
+            var contentSettings = await _dbContext.Set<IPBContentSettings>()
+                                      .Where(s => s.Type == item.GetType().FullName && s.ContentId == item.Id)
+                                      .FirstOrDefaultAsync() ?? new IPBContentSettings
+                                  {
+                                      ContentId = item.Id, Type = item.GetType().FullName
+                                  };
 
-            if (contentPropertiesSet.TopicId == 0)
+            if (contentSettings.TopicId == 0)
             {
                 var topic = new TopicCreateModel
                 {
@@ -149,26 +156,32 @@ namespace BioEngine.Extra.IPB.Api
                     Post = await _contentRender.RenderHtmlAsync(item)
                 };
                 var createdTopic = await PostAsync<TopicCreateModel, Topic>("forums/topics", topic);
-                contentPropertiesSet.TopicId = createdTopic.Id;
-                contentPropertiesSet.PostId = createdTopic.FirstPost.Id;
+                contentSettings.TopicId = createdTopic.Id;
+                contentSettings.PostId = createdTopic.FirstPost.Id;
             }
             else
             {
-                var topic = await PostAsync<TopicCreateModel, Topic>($"forums/topics/{contentPropertiesSet.TopicId.ToString()}",
+                var topic = await PostAsync<TopicCreateModel, Topic>(
+                    $"forums/topics/{contentSettings.TopicId.ToString()}",
                     new TopicCreateModel
                     {
-                        Title = item.Title,
-                        Hidden = !item.IsPublished ? 1 : 0,
-                        Pinned = item.IsPinned ? 1 : 0
+                        Title = item.Title, Hidden = !item.IsPublished ? 1 : 0, Pinned = item.IsPinned ? 1 : 0
                     });
 
-                await PostAsync<PostCreateModel, Models.Post>($"forums/posts/{topic.FirstPost.Id.ToString()}", new PostCreateModel
-                {
-                    Post = await _contentRender.RenderHtmlAsync(item)
-                });
+                await PostAsync<PostCreateModel, Models.Post>($"forums/posts/{topic.FirstPost.Id.ToString()}",
+                    new PostCreateModel {Post = await _contentRender.RenderHtmlAsync(item)});
             }
 
-            await _propertiesProvider.SetAsync(contentPropertiesSet, item);
+            if (contentSettings.Id == Guid.Empty)
+            {
+                _dbContext.Add(contentSettings);
+            }
+            else
+            {
+                _dbContext.Update(contentSettings);
+            }
+
+            await _dbContext.SaveChangesAsync();
 
             return true;
         }

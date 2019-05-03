@@ -1,11 +1,13 @@
 using System;
 using BioEngine.Core.Comments;
+using BioEngine.Core.DB;
 using BioEngine.Core.Modules;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Comments;
+using BioEngine.Extra.IPB.Entities;
 using BioEngine.Extra.IPB.Filters;
 using BioEngine.Extra.IPB.Properties;
 using BioEngine.Extra.IPB.Users;
@@ -21,7 +23,6 @@ namespace BioEngine.Extra.IPB
             IHostingEnvironment environment)
         {
             PropertiesProvider.RegisterBioEngineSectionProperties<IPBSectionPropertiesSet>("ipbsection");
-            PropertiesProvider.RegisterBioEngineContentProperties<IPBContentPropertiesSet>("ipbcontent");
 
             bool.TryParse(configuration["BE_IPB_API_DEV_MODE"] ?? "", out var devMode);
             int.TryParse(configuration["BE_IPB_API_ADMIN_GROUP_ID"], out var adminGroupId);
@@ -45,6 +46,12 @@ namespace BioEngine.Extra.IPB
             });
             services.AddSingleton<IPBApiClientFactory>();
             services.AddScoped<IUserDataProvider, IPBUserDataProvider>();
+        }
+
+        public override void RegisterEntities(BioEntitiesManager entitiesManager)
+        {
+            entitiesManager.Register<IPBContentSettings>();
+            entitiesManager.Register<IPBComment>();
         }
     }
 

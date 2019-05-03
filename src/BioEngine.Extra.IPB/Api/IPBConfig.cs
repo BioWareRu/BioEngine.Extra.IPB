@@ -12,5 +12,6 @@ namespace BioEngine.Extra.IPB.Api
         public int EditorGroupId { get; set; }
         public string ClientId { get; set; }
         public string ReadOnlyKey { get; set; }
+        public string IntegrationKey { get; set; }
     }
 }

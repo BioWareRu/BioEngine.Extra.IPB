@@ -1,12 +1,14 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Comments;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Properties;
+using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
-using BioEngine.Extra.IPB.Properties;
+using BioEngine.Extra.IPB.Entities;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -15,27 +17,32 @@ namespace BioEngine.Extra.IPB.Comments
     [UsedImplicitly]
     public class IPBCommentsProvider : BaseCommentsProvider
     {
-        private readonly PropertiesProvider _propertiesProvider;
         private readonly IPBConfig _options;
 
         public IPBCommentsProvider(BioContext dbContext,
             ILogger<ICommentsProvider> logger,
             IOptions<IPBConfig> options,
-            PropertiesProvider propertiesProvider)
-            : base(dbContext, logger)
+            IUserDataProvider userDataProvider)
+            : base(dbContext, userDataProvider, logger)
         {
-            _propertiesProvider = propertiesProvider;
             _options = options.Value;
         }
 
 
+        protected override IQueryable<BaseComment> GetDbSet()
+        {
+            return DbContext.Set<IPBComment>();
+        }
+
         public override async Task<Uri> GetCommentsUrlAsync(IContentEntity entity)
         {
-            var contentPropertiesSet = await _propertiesProvider.GetAsync<IPBContentPropertiesSet>(entity);
-            if (contentPropertiesSet.TopicId > 0)
+            var contentSettings = await DbContext.Set<IPBContentSettings>()
+                .Where(s => s.Type == entity.GetType().FullName && s.ContentId == entity.Id)
+                .FirstOrDefaultAsync();
+            if (contentSettings?.TopicId > 0)
             {
                 return new Uri(
-                    $"{_options.Url}topic/{contentPropertiesSet.TopicId.ToString()}/?do=getNewComment",
+                    $"{_options.Url}topic/{contentSettings.TopicId.ToString()}/?do=getNewComment",
                     UriKind.Absolute);
             }
 
