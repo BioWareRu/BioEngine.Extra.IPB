@@ -1,10 +1,11 @@
 using System;
+using BioEngine.Core.Comments;
 using BioEngine.Core.Modules;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
-using BioEngine.Core.Site.Filters;
 using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
+using BioEngine.Extra.IPB.Comments;
 using BioEngine.Extra.IPB.Filters;
 using BioEngine.Extra.IPB.Properties;
 using BioEngine.Extra.IPB.Users;
@@ -16,7 +17,8 @@ namespace BioEngine.Extra.IPB
 {
     public abstract class IPBModule : BioEngineModule
     {
-        public override void ConfigureServices(IServiceCollection services, IConfiguration configuration, IHostingEnvironment environment)
+        public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
+            IHostingEnvironment environment)
         {
             PropertiesProvider.RegisterBioEngineSectionProperties<IPBSectionPropertiesSet>("ipbsection");
             PropertiesProvider.RegisterBioEngineContentProperties<IPBContentPropertiesSet>("ipbcontent");
@@ -48,16 +50,18 @@ namespace BioEngine.Extra.IPB
 
     public class IPBSiteModule : IPBModule
     {
-        public override void ConfigureServices(IServiceCollection services, IConfiguration configuration, IHostingEnvironment environment)
+        public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
+            IHostingEnvironment environment)
         {
             base.ConfigureServices(services, configuration, environment);
-            services.AddScoped<IPageFilter, IPBPageFilter>();
+            services.AddScoped<ICommentsProvider, IPBCommentsProvider>();
         }
     }
 
     public class IPBApiModule : IPBModule
     {
-        public override void ConfigureServices(IServiceCollection services, IConfiguration configuration, IHostingEnvironment environment)
+        public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
+            IHostingEnvironment environment)
         {
             base.ConfigureServices(services, configuration, environment);
 

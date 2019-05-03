@@ -4,16 +4,16 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Flurl.Http" Version="2.4.2"/>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0"/>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2"/>
-    <PackageReference Include="BioEngine.Core" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core')"/>
-    <PackageReference Include="BioEngine.Core.API" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core.API')"/>
-    <PackageReference Include="BioEngine.Core.Site" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core.Site')"/>
+    <PackageReference Include="Flurl.Http" Version="2.4.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="BioEngine.Core" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core')" />
+    <PackageReference Include="BioEngine.Core.API" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core.API')" />
+    <PackageReference Include="BioEngine.Core.Site" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core.Site')" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BioEngine.Core\src\BioEngine.Core\BioEngine.Core.csproj" Condition="Exists('..\..\..\BioEngine.Core')"/>
-    <ProjectReference Include="..\..\..\BioEngine.Core.API\src\BioEngine.Core.API\BioEngine.Core.API.csproj" Condition="Exists('..\..\..\BioEngine.Core.API')"/>
-    <ProjectReference Include="..\..\..\BioEngine.Core.Site\src\BioEngine.Core.Site\BioEngine.Core.Site.csproj" Condition="Exists('..\..\..\BioEngine.Core.Site')"/>
+    <ProjectReference Include="..\..\..\BioEngine.Core\src\BioEngine.Core\BioEngine.Core.csproj" Condition="Exists('..\..\..\BioEngine.Core')" />
+    <ProjectReference Include="..\..\..\BioEngine.Core.API\src\BioEngine.Core.API\BioEngine.Core.API.csproj" Condition="Exists('..\..\..\BioEngine.Core.API')" />
+    <ProjectReference Include="..\..\..\BioEngine.Core.Site\src\BioEngine.Core.Site\BioEngine.Core.Site.csproj" Condition="Exists('..\..\..\BioEngine.Core.Site')" />
   </ItemGroup>
 </Project>
