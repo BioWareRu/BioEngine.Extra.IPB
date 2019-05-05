@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Extra.IPB.Api;
-using BioEngine.Extra.IPB.Comments;
 using BioEngine.Extra.IPB.Entities;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
