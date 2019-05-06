@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.DB;
-using BioEngine.Core.Web;
-using BioEngine.Extra.IPB.Entities;
 using BioEngine.Extra.IPB.Models;
 using Flurl.Http;
 using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Post = BioEngine.Core.Entities.Post;
 
 namespace BioEngine.Extra.IPB.Api
 {
@@ -23,26 +16,21 @@ namespace BioEngine.Extra.IPB.Api
     public class IPBApiClientFactory
     {
         private readonly IOptions<IPBConfig> _options;
-        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<IPBApiClient> _logger;
 
-        public IPBApiClientFactory(IOptions<IPBConfig> options, IServiceProvider serviceProvider,
-            ILogger<IPBApiClient> logger)
+        public IPBApiClientFactory(IOptions<IPBConfig> options, ILogger<IPBApiClient> logger)
         {
             _options = options;
-            _serviceProvider = serviceProvider;
             _logger = logger;
         }
 
         public IPBApiClient GetClient(string token)
         {
-            var scopeServiceProvider = _serviceProvider.CreateScope().ServiceProvider;
             return new IPBApiClient(_options.Value, token, _logger);
         }
 
         public IPBApiClient GetReadOnlyClient()
         {
-            var scopeServiceProvider = _serviceProvider.CreateScope().ServiceProvider;
             return new IPBApiClient(_options.Value, null, _logger);
         }
     }
