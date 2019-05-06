@@ -6,10 +6,14 @@ using BioEngine.Core.Entities;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Users;
+using BioEngine.Core.Web;
 using BioEngine.Extra.IPB.Api;
+using BioEngine.Extra.IPB.Entities;
+using BioEngine.Extra.IPB.Models;
 using BioEngine.Extra.IPB.Properties;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Post = BioEngine.Core.Entities.Post;
 
 namespace BioEngine.Extra.IPB.Filters
 {
@@ -18,14 +22,16 @@ namespace BioEngine.Extra.IPB.Filters
         private readonly IPBApiClient _apiClient;
         private readonly PropertiesProvider _propertiesProvider;
         private readonly BioContext _bioContext;
+        private readonly IContentRender _contentRender;
 
         public IPBContentHook(IPBApiClientFactory apiClientFactory, IHttpContextAccessor httpContextAccessor,
-            PropertiesProvider propertiesProvider, BioContext bioContext)
+            PropertiesProvider propertiesProvider, BioContext bioContext, IContentRender contentRender)
         {
             _apiClient =
                 apiClientFactory.GetClient(httpContextAccessor.HttpContext.Features.Get<ICurrentUserFeature>().Token);
             _propertiesProvider = propertiesProvider;
             _bioContext = bioContext;
+            _contentRender = contentRender;
         }
 
         public override bool CanProcess(Type type)
@@ -63,8 +69,64 @@ namespace BioEngine.Extra.IPB.Filters
                     return false;
                 }
 
-                return await _apiClient.CreateOrUpdateContentPostAsync(content, forumId);
+                return await CreateOrUpdateContentPostAsync(content, forumId);
             }
+
+            return true;
+        }
+        
+        public async Task<bool> CreateOrUpdateContentPostAsync(Post item, int forumId)
+        {
+            if (_contentRender == null)
+            {
+                throw new ArgumentException("No content renderer is registered!");
+            }
+
+            //var contentPropertiesSet = await _propertiesProvider.GetAsync<IPBContentPropertiesSet>(item);
+            var contentSettings = await _bioContext.Set<IPBContentSettings>()
+                                      .Where(s => s.Type == item.GetType().FullName && s.ContentId == item.Id)
+                                      .FirstOrDefaultAsync() ?? new IPBContentSettings
+                                  {
+                                      ContentId = item.Id, Type = item.GetType().FullName
+                                  };
+
+            if (contentSettings.TopicId == 0)
+            {
+                var topic = new TopicCreateModel
+                {
+                    Forum = forumId,
+                    Title = item.Title,
+                    Hidden = !item.IsPublished ? 1 : 0,
+                    Pinned = item.IsPinned ? 1 : 0,
+                    Post = await _contentRender.RenderHtmlAsync(item)
+                };
+                var createdTopic = await _apiClient.PostAsync<TopicCreateModel, Topic>("forums/topics", topic);
+                contentSettings.TopicId = createdTopic.Id;
+                contentSettings.PostId = createdTopic.FirstPost.Id;
+            }
+            else
+            {
+                var topic = await _apiClient.PostAsync<TopicCreateModel, Topic>(
+                    $"forums/topics/{contentSettings.TopicId.ToString()}",
+                    new TopicCreateModel
+                    {
+                        Title = item.Title, Hidden = !item.IsPublished ? 1 : 0, Pinned = item.IsPinned ? 1 : 0
+                    });
+
+                await _apiClient.PostAsync<PostCreateModel, Models.Post>($"forums/posts/{topic.FirstPost.Id.ToString()}",
+                    new PostCreateModel {Post = await _contentRender.RenderHtmlAsync(item)});
+            }
+
+            if (contentSettings.Id == Guid.Empty)
+            {
+                _bioContext.Add(contentSettings);
+            }
+            else
+            {
+                _bioContext.Update(contentSettings);
+            }
+
+            await _bioContext.SaveChangesAsync();
 
             return true;
         }

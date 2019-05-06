@@ -37,17 +37,13 @@ namespace BioEngine.Extra.IPB.Api
         public IPBApiClient GetClient(string token)
         {
             var scopeServiceProvider = _serviceProvider.CreateScope().ServiceProvider;
-            return new IPBApiClient(_options.Value, token,
-                scopeServiceProvider.GetRequiredService<BioContext>(),
-                scopeServiceProvider.GetService<IContentRender>(), _logger);
+            return new IPBApiClient(_options.Value, token, _logger);
         }
 
         public IPBApiClient GetReadOnlyClient()
         {
             var scopeServiceProvider = _serviceProvider.CreateScope().ServiceProvider;
-            return new IPBApiClient(_options.Value, null,
-                scopeServiceProvider.GetRequiredService<BioContext>(),
-                scopeServiceProvider.GetService<IContentRender>(), _logger);
+            return new IPBApiClient(_options.Value, null, _logger);
         }
     }
 
@@ -55,17 +51,12 @@ namespace BioEngine.Extra.IPB.Api
     {
         private readonly IPBConfig _config;
         [CanBeNull] private readonly string _token;
-        private readonly BioContext _dbContext;
-        [CanBeNull] private readonly IContentRender _contentRender;
         private readonly ILogger<IPBApiClient> _logger;
 
-        public IPBApiClient(IPBConfig config, string token, BioContext dbContext,
-            IContentRender contentRender, ILogger<IPBApiClient> logger)
+        public IPBApiClient(IPBConfig config, string token, ILogger<IPBApiClient> logger)
         {
             _config = config;
             _token = token;
-            _dbContext = dbContext;
-            _contentRender = contentRender;
             _logger = logger;
         }
 
@@ -95,7 +86,7 @@ namespace BioEngine.Extra.IPB.Api
             return GetRequest(url).GetJsonAsync<T>();
         }
 
-        private async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest item)
+        public async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest item)
         {
             try
             {
@@ -128,62 +119,6 @@ namespace BioEngine.Extra.IPB.Api
         public Task<Topic> GetTopicAsync(int topicId)
         {
             return GetAsync<Topic>($"forums/topics/{topicId.ToString()}");
-        }
-
-        public async Task<bool> CreateOrUpdateContentPostAsync(Post item, int forumId)
-        {
-            if (_contentRender == null)
-            {
-                throw new ArgumentException("No content renderer is registered!");
-            }
-
-            //var contentPropertiesSet = await _propertiesProvider.GetAsync<IPBContentPropertiesSet>(item);
-            var contentSettings = await _dbContext.Set<IPBContentSettings>()
-                                      .Where(s => s.Type == item.GetType().FullName && s.ContentId == item.Id)
-                                      .FirstOrDefaultAsync() ?? new IPBContentSettings
-                                  {
-                                      ContentId = item.Id, Type = item.GetType().FullName
-                                  };
-
-            if (contentSettings.TopicId == 0)
-            {
-                var topic = new TopicCreateModel
-                {
-                    Forum = forumId,
-                    Title = item.Title,
-                    Hidden = !item.IsPublished ? 1 : 0,
-                    Pinned = item.IsPinned ? 1 : 0,
-                    Post = await _contentRender.RenderHtmlAsync(item)
-                };
-                var createdTopic = await PostAsync<TopicCreateModel, Topic>("forums/topics", topic);
-                contentSettings.TopicId = createdTopic.Id;
-                contentSettings.PostId = createdTopic.FirstPost.Id;
-            }
-            else
-            {
-                var topic = await PostAsync<TopicCreateModel, Topic>(
-                    $"forums/topics/{contentSettings.TopicId.ToString()}",
-                    new TopicCreateModel
-                    {
-                        Title = item.Title, Hidden = !item.IsPublished ? 1 : 0, Pinned = item.IsPinned ? 1 : 0
-                    });
-
-                await PostAsync<PostCreateModel, Models.Post>($"forums/posts/{topic.FirstPost.Id.ToString()}",
-                    new PostCreateModel {Post = await _contentRender.RenderHtmlAsync(item)});
-            }
-
-            if (contentSettings.Id == Guid.Empty)
-            {
-                _dbContext.Add(contentSettings);
-            }
-            else
-            {
-                _dbContext.Update(contentSettings);
-            }
-
-            await _dbContext.SaveChangesAsync();
-
-            return true;
         }
     }
 
