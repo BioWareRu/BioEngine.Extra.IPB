@@ -5,12 +5,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Extra.IPB
 {
     public class IPBAuthModule : BioEngineModule
     {
-        public override void ConfigureServices(IServiceCollection services, IConfiguration configuration, IHostingEnvironment environment)
+        public override void ConfigureServices(IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
         {
             services
                 .AddAuthentication("ipbToken")

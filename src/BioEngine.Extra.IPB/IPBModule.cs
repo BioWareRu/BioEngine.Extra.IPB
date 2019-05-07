@@ -11,16 +11,16 @@ using BioEngine.Extra.IPB.Entities;
 using BioEngine.Extra.IPB.Filters;
 using BioEngine.Extra.IPB.Properties;
 using BioEngine.Extra.IPB.Users;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Extra.IPB
 {
     public abstract class IPBModule : BioEngineModule
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
-            IHostingEnvironment environment)
+            IHostEnvironment environment)
         {
             PropertiesProvider.RegisterBioEngineSectionProperties<IPBSectionPropertiesSet>("ipbsection");
 
@@ -58,7 +58,7 @@ namespace BioEngine.Extra.IPB
     public class IPBSiteModule : IPBModule
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
-            IHostingEnvironment environment)
+            IHostEnvironment environment)
         {
             base.ConfigureServices(services, configuration, environment);
             services.AddScoped<ICommentsProvider, IPBCommentsProvider>();
@@ -68,11 +68,10 @@ namespace BioEngine.Extra.IPB
     public class IPBApiModule : IPBModule
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
-            IHostingEnvironment environment)
+            IHostEnvironment environment)
         {
             base.ConfigureServices(services, configuration, environment);
 
-            services.AddMvc().AddApplicationPart(typeof(WebHostBuilderExtensions).Assembly);
             services.AddScoped<IRepositoryHook, IPBContentHook>();
             services.AddScoped<IPropertiesOptionsResolver, IPBSectionPropertiesOptionsResolver>();
         }
