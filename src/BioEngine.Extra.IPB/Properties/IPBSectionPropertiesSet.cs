@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Http;
 
 namespace BioEngine.Extra.IPB.Properties
 {
-    [PropertiesSet(Name = "Публикация на форуме", IsEditable = true)]
+    [PropertiesSet("Публикация на форуме", IsEditable = true)]
     public class IPBSectionPropertiesSet : PropertiesSet
     {
-        [PropertiesElement(Name = "Раздел на форуме", Type = PropertyElementType.Dropdown)]
+        [PropertiesElement("Раздел на форуме", PropertyElementType.Dropdown)]
         public int ForumId { get; set; }
     }
 
