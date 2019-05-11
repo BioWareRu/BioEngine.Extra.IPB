@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Comments;
@@ -34,19 +35,32 @@ namespace BioEngine.Extra.IPB.Comments
             return DbContext.Set<IPBComment>();
         }
 
-        public override async Task<Uri> GetCommentsUrlAsync(IContentEntity entity)
+        public override async Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(IContentEntity[] entities)
         {
+            var types = entities.Select(e => e.GetType().FullName).Distinct().ToArray();
+            var ids = entities.Select(e => e.Id).ToArray();
+
             var contentSettings = await DbContext.Set<IPBContentSettings>()
-                .Where(s => s.Type == entity.GetType().FullName && s.ContentId == entity.Id)
-                .FirstOrDefaultAsync();
-            if (contentSettings?.TopicId > 0)
+                .Where(s => types.Contains(s.Type) && ids.Contains(s.ContentId))
+                .ToListAsync();
+
+            var result = new Dictionary<Guid, Uri?>();
+            foreach (var entity in entities)
             {
-                return new Uri(
-                    $"{_options.Url}topic/{contentSettings.TopicId.ToString()}/?do=getNewComment",
-                    UriKind.Absolute);
+                Uri? uri = null;
+                var settings = contentSettings.FirstOrDefault(c =>
+                    c.Type == entity.GetType().FullName && c.ContentId == entity.Id);
+                if (settings?.TopicId > 0)
+                {
+                    uri = new Uri(
+                        $"{_options.Url}topic/{settings.TopicId.ToString()}/?do=getNewComment",
+                        UriKind.Absolute);
+                }
+
+                result.Add(entity.Id, uri);
             }
 
-            return null;
+            return result;
         }
     }
 }
