@@ -2,6 +2,7 @@
 
 namespace BioEngine.Extra.IPB.Api
 {
+#pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public class IPBConfig
     {
         public Uri Url { get; set; }
@@ -14,4 +15,5 @@ namespace BioEngine.Extra.IPB.Api
         public string ReadOnlyKey { get; set; }
         public string IntegrationKey { get; set; }
     }
+#pragma warning restore CS8618 // Non-nullable field is uninitialized.
 }

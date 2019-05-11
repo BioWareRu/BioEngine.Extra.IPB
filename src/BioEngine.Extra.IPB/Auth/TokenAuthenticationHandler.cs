@@ -107,7 +107,7 @@ namespace BioEngine.Extra.IPB.Auth
             return AuthenticateResult.Success(userTicket);
         }
 
-        private async Task<User> GetUserAsync(string token)
+        private async Task<User?> GetUserAsync(string token)
         {
             var exists = TokenUsers.TryGetValue(token, out var user);
             if (!exists)

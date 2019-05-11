@@ -60,11 +60,11 @@ namespace BioEngine.Extra.IPB.Users
             }
         }
 
-        private IPBApiClient _apiClient;
+        private IPBApiClient? _apiClient;
 
         private IPBApiClient GetApiClient()
         {
-            return _apiClient ?? (_apiClient = _clientFactory.GetReadOnlyClient());
+            return _apiClient ??= _clientFactory.GetReadOnlyClient();
         }
     }
 }

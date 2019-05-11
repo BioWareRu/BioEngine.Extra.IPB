@@ -34,7 +34,7 @@ namespace BioEngine.Extra.IPB.Properties
             return properties is IPBSectionPropertiesSet;
         }
 
-        public async Task<List<PropertiesOption>> ResolveAsync(PropertiesSet properties, string property)
+        public async Task<List<PropertiesOption>?> ResolveAsync(PropertiesSet properties, string property)
         {
             switch (property)
             {

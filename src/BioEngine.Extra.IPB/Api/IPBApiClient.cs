@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using BioEngine.Extra.IPB.Models;
 using Flurl.Http;
@@ -38,10 +39,10 @@ namespace BioEngine.Extra.IPB.Api
     public class IPBApiClient
     {
         private readonly IPBConfig _config;
-        [CanBeNull] private readonly string _token;
+        private readonly string? _token;
         private readonly ILogger<IPBApiClient> _logger;
 
-        public IPBApiClient(IPBConfig config, string token, ILogger<IPBApiClient> logger)
+        public IPBApiClient(IPBConfig config, string? token, ILogger<IPBApiClient> logger)
         {
             _config = config;
             _token = token;
@@ -78,14 +79,20 @@ namespace BioEngine.Extra.IPB.Api
         {
             try
             {
-                var response = await GetRequest(url).PostUrlEncodedAsync(item.ToKeyValue());
-                var json = await response.Content.ReadAsStringAsync();
-                if (response.IsSuccessStatusCode)
+                if (item != null)
                 {
-                    return JsonConvert.DeserializeObject<TResponse>(json);
+                    var data = item.ToKeyValue();
+                    var response = await GetRequest(url).PostUrlEncodedAsync(data);
+                    var json = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return JsonConvert.DeserializeObject<TResponse>(json);
+                    }
+
+                    throw new IPBApiException(response.StatusCode, JsonConvert.DeserializeObject<IPBApiError>(json));
                 }
 
-                throw new IPBApiException(response.StatusCode, JsonConvert.DeserializeObject<IPBApiError>(json));
+                throw new IPBApiException(HttpStatusCode.BadRequest, new IPBApiError {ErrorMessage = "Empty request"});
             }
             catch (FlurlHttpException ex)
             {
@@ -112,15 +119,9 @@ namespace BioEngine.Extra.IPB.Api
 
     public static class IPBApiClientHelper
     {
-        public static IDictionary<string, string> ToKeyValue(this object metaToken)
+        public static IDictionary<string, string>? ToKeyValue(this object metaToken)
         {
-            if (metaToken == null)
-            {
-                return null;
-            }
-
-            JToken token = metaToken as JToken;
-            if (token == null)
+            if (!(metaToken is JToken token))
             {
                 return ToKeyValue(JObject.FromObject(metaToken));
             }

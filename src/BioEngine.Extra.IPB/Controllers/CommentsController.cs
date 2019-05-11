@@ -71,7 +71,7 @@ namespace BioEngine.Extra.IPB.Controllers
                     _dbContext.Update(comment);
                 }
 
-                IContentEntity entity = null;
+                IContentEntity? entity = null;
                 if (settings.Type == typeof(Post).FullName)
                 {
                     entity =

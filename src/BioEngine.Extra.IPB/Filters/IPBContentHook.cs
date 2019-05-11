@@ -39,12 +39,10 @@ namespace BioEngine.Extra.IPB.Filters
             return typeof(Post).IsAssignableFrom(type);
         }
 
-        public override async Task<bool> AfterSaveAsync<T>(T item, PropertyChange[] changes = null,
-            IBioRepositoryOperationContext operationContext = null)
+        public override async Task<bool> AfterSaveAsync<T>(T item, PropertyChange[]? changes = null,
+            IBioRepositoryOperationContext? operationContext = null)
         {
-            var content = item as Post;
-
-            if (content != null)
+            if (item is Post content)
             {
                 var forumId = 0;
                 if (content.SectionIds.Length == 1)
@@ -74,7 +72,7 @@ namespace BioEngine.Extra.IPB.Filters
 
             return true;
         }
-        
+
         public async Task<bool> CreateOrUpdateContentPostAsync(Post item, int forumId)
         {
             if (_contentRender == null)
@@ -101,8 +99,11 @@ namespace BioEngine.Extra.IPB.Filters
                     Post = await _contentRender.RenderHtmlAsync(item)
                 };
                 var createdTopic = await _apiClient.PostAsync<TopicCreateModel, Topic>("forums/topics", topic);
-                contentSettings.TopicId = createdTopic.Id;
-                contentSettings.PostId = createdTopic.FirstPost.Id;
+                if (createdTopic.FirstPost != null)
+                {
+                    contentSettings.TopicId = createdTopic.Id;
+                    contentSettings.PostId = createdTopic.FirstPost.Id;
+                }
             }
             else
             {
@@ -112,9 +113,12 @@ namespace BioEngine.Extra.IPB.Filters
                     {
                         Title = item.Title, Hidden = !item.IsPublished ? 1 : 0, Pinned = item.IsPinned ? 1 : 0
                     });
-
-                await _apiClient.PostAsync<PostCreateModel, Models.Post>($"forums/posts/{topic.FirstPost.Id.ToString()}",
-                    new PostCreateModel {Post = await _contentRender.RenderHtmlAsync(item)});
+                if (topic.FirstPost != null)
+                {
+                    await _apiClient.PostAsync<PostCreateModel, Models.Post>(
+                        $"forums/posts/{topic.FirstPost.Id.ToString()}",
+                        new PostCreateModel {Post = await _contentRender.RenderHtmlAsync(item)});
+                }
             }
 
             if (contentSettings.Id == Guid.Empty)
