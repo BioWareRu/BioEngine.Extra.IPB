@@ -48,11 +48,16 @@ namespace BioEngine.Extra.IPB
 
     public class IPBModuleConfig
     {
+        public IPBModuleConfig(Uri url)
+        {
+            Url = url;
+        }
+
         public bool DevMode { get; set; }
         public int AdminGroupId { get; set; }
         public int PublisherGroupId { get; set; }
         public int EditorGroupId { get; set; }
-        public Uri? Url { get; set; }
+        public Uri Url { get; }
         public Uri ApiUrl => new Uri($"{Url!}/api");
         public string ApiClientId { get; set; } = "";
         public string ApiClientSecret { get; set; } = "";
