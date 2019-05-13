@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Comments;
@@ -33,6 +34,7 @@ namespace BioEngine.Extra.IPB.Comments
             return DbContext.Set<IPBComment>();
         }
 
+        [SuppressMessage("ReSharper", "RCS1198")]
         public override async Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(IContentEntity[] entities)
         {
             var types = entities.Select(e => e.GetType().FullName).Distinct().ToArray();

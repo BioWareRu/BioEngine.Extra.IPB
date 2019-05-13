@@ -52,8 +52,8 @@ namespace BioEngine.Extra.IPB
         public int AdminGroupId { get; set; }
         public int PublisherGroupId { get; set; }
         public int EditorGroupId { get; set; }
-        public Uri Url { get; set; }
-        public Uri ApiUrl => new Uri($"{Url}/api");
+        public Uri? Url { get; set; }
+        public Uri ApiUrl => new Uri($"{Url!}/api");
         public string ApiClientId { get; set; } = "";
         public string ApiClientSecret { get; set; } = "";
         public string CallbackPath { get; set; } = "";
