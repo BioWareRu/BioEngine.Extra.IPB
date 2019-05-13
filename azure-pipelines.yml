@@ -42,3 +42,7 @@ steps:
           publishVstsFeed: 'BioEngine'
           versioningScheme: byEnvVar
           versionEnvVar: 'Version'
+    - task: PublishPipelineArtifact@0
+      inputs:
+          artifactName: 'packages'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
