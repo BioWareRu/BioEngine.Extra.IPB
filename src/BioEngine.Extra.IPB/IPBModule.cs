@@ -6,6 +6,7 @@ using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
+using BioEngine.Extra.IPB.Auth;
 using BioEngine.Extra.IPB.Comments;
 using BioEngine.Extra.IPB.Entities;
 using BioEngine.Extra.IPB.Filters;
@@ -17,33 +18,23 @@ using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Extra.IPB
 {
-    public abstract class IPBModule : BioEngineModule
+    public abstract class IPBModule : BioEngineModule<IPBModuleConfig>
     {
+        protected override void CheckConfig()
+        {
+            if (Config.Url == null)
+            {
+                throw new ArgumentException($"IPB url is not set");
+            }
+        }
+
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
         {
             PropertiesProvider.RegisterBioEngineSectionProperties<IPBSectionPropertiesSet>("ipbsection");
 
-            bool.TryParse(configuration["BE_IPB_API_DEV_MODE"] ?? "", out var devMode);
-            int.TryParse(configuration["BE_IPB_API_ADMIN_GROUP_ID"], out var adminGroupId);
-            int.TryParse(configuration["BE_IPB_API_PUBLISHER_GROUP_ID"], out var publisherGroupId);
-            int.TryParse(configuration["BE_IPB_API_EDITOR_GROUP_ID"], out var editorGroupId);
-            if (!Uri.TryCreate(configuration["BE_IPB_URL"], UriKind.Absolute, out var ipbUrl))
-            {
-                throw new ArgumentException($"Can't parse IPB url; {configuration["BE_IPB_URL"]}");
-            }
 
-            services.Configure<IPBConfig>(config =>
-            {
-                config.Url = ipbUrl;
-                config.ApiUrl = new Uri($"{ipbUrl}/api");
-                config.DevMode = devMode;
-                config.AdminGroupId = adminGroupId;
-                config.PublisherGroupId = publisherGroupId;
-                config.EditorGroupId = editorGroupId;
-                config.ClientId = configuration["BE_IPB_API_CLIENT_ID"];
-                config.ReadOnlyKey = configuration["BE_IPB_API_READONLY_KEY"];
-            });
+            services.AddSingleton(Config);
             services.AddSingleton<IPBApiClientFactory>();
             services.AddScoped<IUserDataProvider, IPBUserDataProvider>();
         }
@@ -55,6 +46,24 @@ namespace BioEngine.Extra.IPB
         }
     }
 
+    public class IPBModuleConfig
+    {
+        public bool DevMode { get; set; }
+        public int AdminGroupId { get; set; }
+        public int PublisherGroupId { get; set; }
+        public int EditorGroupId { get; set; }
+        public Uri Url { get; set; }
+        public Uri ApiUrl => new Uri($"{Url}/api");
+        public string ApiClientId { get; set; } = "";
+        public string ApiClientSecret { get; set; } = "";
+        public string CallbackPath { get; set; } = "";
+        public string AuthorizationEndpoint { get; set; } = "";
+        public string TokenEndpoint { get; set; } = "";
+        public string ApiReadonlyKey { get; set; } = "";
+
+        public string IntegrationKey { get; set; } = "";
+    }
+
     public class IPBSiteModule : IPBModule
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
@@ -62,6 +71,7 @@ namespace BioEngine.Extra.IPB
         {
             base.ConfigureServices(services, configuration, environment);
             services.AddScoped<ICommentsProvider, IPBCommentsProvider>();
+            services.AddIpbOauthAuthentication(Config);
         }
     }
 

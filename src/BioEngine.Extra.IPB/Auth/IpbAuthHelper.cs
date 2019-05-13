@@ -5,14 +5,13 @@ using BioEngine.Extra.IPB.Api;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BioEngine.Extra.IPB.Auth
 {
     public static class IpbAuthHelper
     {
-        public static void AddIpbOauthAuthentication(this IServiceCollection services, IConfiguration configuration)
+        public static void AddIpbOauthAuthentication(this IServiceCollection services, IPBModuleConfig configuration)
         {
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o =>
             {
@@ -22,11 +21,11 @@ namespace BioEngine.Extra.IPB.Auth
                 options =>
                 {
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.ClientId = configuration["BE_IPB_OAUTH_CLIENT_ID"];
-                    options.ClientSecret = configuration["BE_IPB_OAUTH_CLIENT_SECRET"];
-                    options.CallbackPath = new PathString(configuration["BE_IPB_CALLBACK_PATH"]);
-                    options.AuthorizationEndpoint = configuration["BE_IPB_AUTHORIZATION_ENDPOINT"];
-                    options.TokenEndpoint = configuration["BE_IPB_TOKEN_ENDPOINT"];
+                    options.ClientId = configuration.ApiClientId;
+                    options.ClientSecret = configuration.ApiClientSecret;
+                    options.CallbackPath = new PathString(configuration.CallbackPath);
+                    options.AuthorizationEndpoint = configuration.AuthorizationEndpoint;
+                    options.TokenEndpoint = configuration.TokenEndpoint;
                     options.Scope.Add("profile");
                     options.SaveTokens = true;
                     options.Events = new OAuthEvents

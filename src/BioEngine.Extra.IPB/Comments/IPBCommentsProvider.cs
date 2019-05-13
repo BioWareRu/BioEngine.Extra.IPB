@@ -6,27 +6,25 @@ using BioEngine.Core.Comments;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Users;
-using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Entities;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace BioEngine.Extra.IPB.Comments
 {
     [UsedImplicitly]
     public class IPBCommentsProvider : BaseCommentsProvider
     {
-        private readonly IPBConfig _options;
+        private readonly IPBModuleConfig _options;
 
         public IPBCommentsProvider(BioContext dbContext,
             ILogger<ICommentsProvider> logger,
-            IOptions<IPBConfig> options,
+            IPBModuleConfig options,
             IUserDataProvider userDataProvider)
             : base(dbContext, userDataProvider, logger)
         {
-            _options = options.Value;
+            _options = options;
         }
 
 

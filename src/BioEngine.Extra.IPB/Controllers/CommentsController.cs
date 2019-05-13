@@ -3,12 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
-using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Entities;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace BioEngine.Extra.IPB.Controllers
 {
@@ -17,12 +15,12 @@ namespace BioEngine.Extra.IPB.Controllers
     public class CommentsController : Controller
     {
         private readonly BioContext _dbContext;
-        private IPBConfig _options;
+        private IPBModuleConfig _options;
 
-        public CommentsController(BioContext dbContext, IOptions<IPBConfig> options)
+        public CommentsController(BioContext dbContext, IPBModuleConfig options)
         {
             _dbContext = dbContext;
-            _options = options.Value;
+            _options = options;
         }
 
         private bool CheckAccess()

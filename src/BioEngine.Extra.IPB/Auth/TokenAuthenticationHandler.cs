@@ -17,14 +17,14 @@ namespace BioEngine.Extra.IPB.Auth
     [UsedImplicitly]
     public class TokenAuthenticationHandler : AuthenticationHandler<IPBTokenAuthOptions>
     {
-        private readonly IOptions<IPBConfig> _ipbApiOptions;
+        private readonly IPBModuleConfig _ipbApiOptions;
         private readonly IPBApiClientFactory _apiClientFactory;
 
         private static readonly ConcurrentDictionary<string, User>
             TokenUsers = new ConcurrentDictionary<string, User>();
 
         public TokenAuthenticationHandler(IOptionsMonitor<IPBTokenAuthOptions> options, ILoggerFactory logger,
-            UrlEncoder encoder, ISystemClock clock, IOptions<IPBConfig> ipbApiOptions,
+            UrlEncoder encoder, ISystemClock clock, IPBModuleConfig ipbApiOptions,
             IPBApiClientFactory apiClientFactory) : base(options, logger, encoder, clock)
         {
             _ipbApiOptions = ipbApiOptions;
@@ -44,7 +44,7 @@ namespace BioEngine.Extra.IPB.Auth
 
                     if (!string.IsNullOrEmpty(tokenString))
                     {
-                        if (_ipbApiOptions.Value.DevMode)
+                        if (_ipbApiOptions.DevMode)
                             return HandleAuthenticateDev(tokenString);
                         var user = await GetUserAsync(tokenString);
                         if (user != null)
@@ -72,17 +72,17 @@ namespace BioEngine.Extra.IPB.Auth
             identity.AddClaim(new Claim("Id", user.Id.ToString()));
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Name));
             var groups = user.GetGroupIds();
-            if (groups.Contains(_ipbApiOptions.Value.AdminGroupId))
+            if (groups.Contains(_ipbApiOptions.AdminGroupId))
             {
                 identity.AddClaim(new Claim(ClaimTypes.Role, "admin"));
             }
 
-            if (groups.Contains(_ipbApiOptions.Value.PublisherGroupId))
+            if (groups.Contains(_ipbApiOptions.PublisherGroupId))
             {
                 identity.AddClaim(new Claim(ClaimTypes.Role, "publisher"));
             }
 
-            if (groups.Contains(_ipbApiOptions.Value.EditorGroupId))
+            if (groups.Contains(_ipbApiOptions.EditorGroupId))
             {
                 identity.AddClaim(new Claim(ClaimTypes.Role, "editor"));
             }
@@ -100,7 +100,7 @@ namespace BioEngine.Extra.IPB.Auth
                 Name = "Sonic",
                 PhotoUrl = "/assets/img/avatar.png",
                 ProfileUrl = "#",
-                PrimaryGroup = new Group {Id = _ipbApiOptions.Value.AdminGroupId}
+                PrimaryGroup = new Group {Id = _ipbApiOptions.AdminGroupId}
             };
             var userTicket = AuthenticationTicket(user);
             Context.Features.Set<ICurrentUserFeature>(new CurrentUserFeature(user, token));

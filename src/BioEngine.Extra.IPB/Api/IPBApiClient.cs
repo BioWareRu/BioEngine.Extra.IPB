@@ -7,7 +7,6 @@ using BioEngine.Extra.IPB.Models;
 using Flurl.Http;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -16,10 +15,10 @@ namespace BioEngine.Extra.IPB.Api
     [UsedImplicitly]
     public class IPBApiClientFactory
     {
-        private readonly IOptions<IPBConfig> _options;
+        private readonly IPBModuleConfig _options;
         private readonly ILogger<IPBApiClient> _logger;
 
-        public IPBApiClientFactory(IOptions<IPBConfig> options, ILogger<IPBApiClient> logger)
+        public IPBApiClientFactory(IPBModuleConfig options, ILogger<IPBApiClient> logger)
         {
             _options = options;
             _logger = logger;
@@ -27,22 +26,22 @@ namespace BioEngine.Extra.IPB.Api
 
         public IPBApiClient GetClient(string token)
         {
-            return new IPBApiClient(_options.Value, token, _logger);
+            return new IPBApiClient(_options, token, _logger);
         }
 
         public IPBApiClient GetReadOnlyClient()
         {
-            return new IPBApiClient(_options.Value, null, _logger);
+            return new IPBApiClient(_options, null, _logger);
         }
     }
 
     public class IPBApiClient
     {
-        private readonly IPBConfig _config;
+        private readonly IPBModuleConfig _config;
         private readonly string? _token;
         private readonly ILogger<IPBApiClient> _logger;
 
-        public IPBApiClient(IPBConfig config, string? token, ILogger<IPBApiClient> logger)
+        public IPBApiClient(IPBModuleConfig config, string? token, ILogger<IPBApiClient> logger)
         {
             _config = config;
             _token = token;
@@ -63,7 +62,7 @@ namespace BioEngine.Extra.IPB.Api
             }
             else
             {
-                requestUrl.SetQueryParam("key", _config.ReadOnlyKey);
+                requestUrl.SetQueryParam("key", _config.ApiReadonlyKey);
             }
 
             return requestUrl;
