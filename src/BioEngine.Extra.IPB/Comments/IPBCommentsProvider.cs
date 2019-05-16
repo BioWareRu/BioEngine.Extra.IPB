@@ -8,6 +8,7 @@ using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Entities;
+using BioEngine.Extra.IPB.Publishing;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -40,7 +41,7 @@ namespace BioEngine.Extra.IPB.Comments
             var types = entities.Select(e => e.GetType().FullName).Distinct().ToArray();
             var ids = entities.Select(e => e.Id).ToArray();
 
-            var contentSettings = await DbContext.Set<IPBContentSettings>()
+            var contentSettings = await DbContext.Set<IPBPublishRecord>()
                 .Where(s => types.Contains(s.Type) && ids.Contains(s.ContentId))
                 .ToListAsync();
 

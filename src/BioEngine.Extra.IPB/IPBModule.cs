@@ -1,16 +1,17 @@
 using System;
 using BioEngine.Core.Comments;
 using BioEngine.Core.DB;
+using BioEngine.Core.Entities;
 using BioEngine.Core.Modules;
 using BioEngine.Core.Properties;
-using BioEngine.Core.Repository;
+using BioEngine.Core.Publishers;
 using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Auth;
 using BioEngine.Extra.IPB.Comments;
 using BioEngine.Extra.IPB.Entities;
-using BioEngine.Extra.IPB.Filters;
 using BioEngine.Extra.IPB.Properties;
+using BioEngine.Extra.IPB.Publishing;
 using BioEngine.Extra.IPB.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +32,7 @@ namespace BioEngine.Extra.IPB
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
         {
-            PropertiesProvider.RegisterBioEngineSectionProperties<IPBSectionPropertiesSet>("ipbsection");
+            PropertiesProvider.RegisterBioEngineProperties<IPBSitePropertiesSet, Site>("ipbsite");
 
 
             services.AddSingleton(Config);
@@ -41,7 +42,7 @@ namespace BioEngine.Extra.IPB
 
         public override void RegisterEntities(BioEntitiesManager entitiesManager)
         {
-            entitiesManager.Register<IPBContentSettings>();
+            entitiesManager.Register<IPBPublishRecord>();
             entitiesManager.Register<IPBComment>();
         }
     }
@@ -87,7 +88,8 @@ namespace BioEngine.Extra.IPB
         {
             base.ConfigureServices(services, configuration, environment);
 
-            services.AddScoped<IRepositoryHook, IPBContentHook>();
+            services.AddScoped<IContentPublisher<IPBPublishConfig>, IPBContentPublisher>();
+            services.AddScoped<IPBContentPublisher>();
             services.AddScoped<IPropertiesOptionsResolver, IPBSectionPropertiesOptionsResolver>();
         }
     }

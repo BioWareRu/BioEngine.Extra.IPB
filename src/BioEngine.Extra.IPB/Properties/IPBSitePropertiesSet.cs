@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 namespace BioEngine.Extra.IPB.Properties
 {
     [PropertiesSet("Публикация на форуме", IsEditable = true)]
-    public class IPBSectionPropertiesSet : PropertiesSet
+    public class IPBSitePropertiesSet : PropertiesSet
     {
         [PropertiesElement("Раздел на форуме", PropertyElementType.Dropdown)]
         public int ForumId { get; set; }
@@ -31,7 +31,7 @@ namespace BioEngine.Extra.IPB.Properties
 
         public bool CanResolve(PropertiesSet properties)
         {
-            return properties is IPBSectionPropertiesSet;
+            return properties is IPBSitePropertiesSet;
         }
 
         public async Task<List<PropertiesOption>?> ResolveAsync(PropertiesSet properties, string property)

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Extra.IPB.Entities;
+using BioEngine.Extra.IPB.Publishing;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +47,7 @@ namespace BioEngine.Extra.IPB.Controllers
                 return Forbid();
             }
 
-            var settings = await _dbContext.Set<IPBContentSettings>().Where(s => s.TopicId == commentData.TopicId)
+            var settings = await _dbContext.Set<IPBPublishRecord>().Where(s => s.TopicId == commentData.TopicId)
                 .FirstOrDefaultAsync();
             if (settings != null)
             {
@@ -108,7 +109,7 @@ namespace BioEngine.Extra.IPB.Controllers
                 return Forbid();
             }
 
-            var settings = await _dbContext.Set<IPBContentSettings>().Where(s => s.TopicId == commentData.TopicId)
+            var settings = await _dbContext.Set<IPBPublishRecord>().Where(s => s.TopicId == commentData.TopicId)
                 .FirstOrDefaultAsync();
             if (settings != null)
             {
