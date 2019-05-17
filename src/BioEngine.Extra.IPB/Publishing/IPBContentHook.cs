@@ -26,7 +26,7 @@ namespace BioEngine.Extra.IPB.Publishing
         protected override async Task<IPBPublishRecord> DoPublishAsync(IContentEntity entity, Site site,
             IPBPublishConfig config)
         {
-            return await CreateOrUpdateContentPostAsync(entity, config);
+            return await CreateOrUpdateContentPostAsync(entity, site, config);
         }
 
         protected override async Task<bool> DoDeleteAsync(IPBPublishRecord record, IPBPublishConfig config)
@@ -38,7 +38,7 @@ namespace BioEngine.Extra.IPB.Publishing
             return result.Hidden;
         }
 
-        private async Task<IPBPublishRecord> CreateOrUpdateContentPostAsync(IContentEntity item,
+        private async Task<IPBPublishRecord> CreateOrUpdateContentPostAsync(IContentEntity item, Site site,
             IPBPublishConfig config)
         {
             if (_contentRender == null)
@@ -59,7 +59,7 @@ namespace BioEngine.Extra.IPB.Publishing
                     Forum = config.ForumId,
                     Title = item.Title,
                     Hidden = !item.IsPublished ? 1 : 0,
-                    Post = await _contentRender.RenderHtmlAsync(item)
+                    Post = await _contentRender.RenderHtmlAsync(item, site)
                 };
                 var createdTopic = await apiClient.PostAsync<TopicCreateModel, Topic>("forums/topics", topic);
                 if (createdTopic.FirstPost != null)
@@ -77,7 +77,7 @@ namespace BioEngine.Extra.IPB.Publishing
                 {
                     await apiClient.PostAsync<PostCreateModel, Models.Post>(
                         $"forums/posts/{topic.FirstPost.Id.ToString()}",
-                        new PostCreateModel {Post = await _contentRender.RenderHtmlAsync(item)});
+                        new PostCreateModel {Post = await _contentRender.RenderHtmlAsync(item, site)});
                 }
             }
 
