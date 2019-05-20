@@ -52,7 +52,7 @@ namespace BioEngine.Extra.IPB.Controllers
                                   {
                                       Type = record.Type,
                                       ContentId = record.ContentId,
-                                      AuthorId = post.Author.Id,
+                                      AuthorId = post.Author.Id ?? 0,
                                       PostId = post.Id,
                                       DateAdded = post.Date
                                   };

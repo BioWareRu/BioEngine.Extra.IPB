@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BioEngine.Core.Users;
+using BioEngine.Extra.IPB.Models;
 
-namespace BioEngine.Extra.IPB.Models
+namespace BioEngine.Extra.IPB.Auth
 {
     public class User : IUser
     {
