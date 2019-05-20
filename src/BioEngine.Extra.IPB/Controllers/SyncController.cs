@@ -23,6 +23,7 @@ namespace BioEngine.Extra.IPB.Controllers
             _dbContext = dbContext;
         }
 
+        [HttpGet("comments")]
         public async Task<ActionResult<bool>> SyncCommentsAsync()
         {
             var records = await _dbContext.Set<IPBPublishRecord>().ToListAsync();
