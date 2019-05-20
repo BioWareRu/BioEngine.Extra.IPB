@@ -2,19 +2,19 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.API.Response;
+using BioEngine.Core.Web;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace BioEngine.Extra.IPB.Controllers
 {
     public class ForumsController : IPBController
     {
-        public ForumsController(IPBApiClientFactory factory, ILogger<ForumsController> logger) : base(factory, logger)
+        public ForumsController(BaseControllerContext context, IPBApiClientFactory factory) : base(context, factory)
         {
         }
-
+        
         [HttpGet]
         public async Task<ActionResult<ListResponse<Forum>>> GetAsync(int offset = 1, int limit = 25)
         {
