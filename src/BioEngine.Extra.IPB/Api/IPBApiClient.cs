@@ -114,6 +114,11 @@ namespace BioEngine.Extra.IPB.Api
         {
             return GetAsync<Topic>($"forums/topics/{topicId.ToString()}");
         }
+
+        public Task<Response<Post>> GetPostsAsync(int topicId,int page = 1, int perPage = 25)
+        {
+            return GetAsync<Response<Post>>($"forums/topics/{topicId.ToString()}/posts?page={page.ToString()}&perPage={perPage.ToString()}");
+        }
     }
 
     public static class IPBApiClientHelper
