@@ -18,5 +18,6 @@ namespace BioEngine.Extra.IPB.Controllers
         }
 
         protected IPBApiClient Client => _factory.GetClient(CurrentToken);
+        protected IPBApiClient ReadOnlyClient => _factory.GetReadOnlyClient();
     }
 }

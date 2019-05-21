@@ -27,13 +27,14 @@ namespace BioEngine.Extra.IPB.Controllers
         public async Task<ActionResult<bool>> SyncCommentsAsync()
         {
             var records = await _dbContext.Set<IPBPublishRecord>().ToListAsync();
+            var client = ReadOnlyClient;
             foreach (var record in records)
             {
                 var page = 1;
                 var posts = new List<Post>();
                 while (true)
                 {
-                    var response = await Client.GetPostsAsync(record.TopicId, page);
+                    var response = await client.GetPostsAsync(record.TopicId, page);
                     posts.AddRange(response.Results);
                     if (page < response.TotalPages)
                     {
