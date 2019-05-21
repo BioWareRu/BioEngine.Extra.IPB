@@ -10,6 +10,7 @@ using BioEngine.Extra.IPB.Models;
 using BioEngine.Extra.IPB.Publishing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BioEngine.Extra.IPB.Controllers
 {
@@ -30,20 +31,30 @@ namespace BioEngine.Extra.IPB.Controllers
             var client = ReadOnlyClient;
             foreach (var record in records)
             {
-                var page = 1;
                 var posts = new List<Post>();
-                while (true)
+
+                try
                 {
-                    var response = await client.GetPostsAsync(record.TopicId, page, 500);
-                    posts.AddRange(response.Results);
-                    if (page < response.TotalPages)
+                    var page = 1;
+
+                    while (true)
                     {
-                        page++;
+                        var response = await client.GetPostsAsync(record.TopicId, page, 500);
+                        posts.AddRange(response.Results);
+                        if (page < response.TotalPages)
+                        {
+                            page++;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
-                    else
-                    {
-                        break;
-                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "Error while downloading posts for record {recordId}: {errorText}", record.Id,
+                        ex.ToString());
                 }
 
                 foreach (var post in posts)
