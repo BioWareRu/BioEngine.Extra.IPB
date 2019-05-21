@@ -34,7 +34,7 @@ namespace BioEngine.Extra.IPB.Controllers
                 var posts = new List<Post>();
                 while (true)
                 {
-                    var response = await client.GetPostsAsync(record.TopicId, page);
+                    var response = await client.GetPostsAsync(record.TopicId, page, 500);
                     posts.AddRange(response.Results);
                     if (page < response.TotalPages)
                     {
