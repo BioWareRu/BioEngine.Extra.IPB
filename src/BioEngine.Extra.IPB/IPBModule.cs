@@ -40,7 +40,7 @@ namespace BioEngine.Extra.IPB
             services.AddScoped<IUserDataProvider, IPBUserDataProvider>();
         }
 
-        public override void RegisterEntities(BioEntitiesManager entitiesManager)
+        public override void ConfigureDbContext(BioEntitiesManager entitiesManager)
         {
             entitiesManager.Register<IPBPublishRecord>();
             entitiesManager.Register<IPBComment>();

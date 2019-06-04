@@ -36,7 +36,7 @@ namespace BioEngine.Extra.IPB.Comments
         }
 
         [SuppressMessage("ReSharper", "RCS1198")]
-        public override async Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(IContentEntity[] entities)
+        public override async Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(ContentItem[] entities)
         {
             var types = entities.Select(e => e.GetType().FullName).Distinct().ToArray();
             var ids = entities.Select(e => e.Id).ToArray();

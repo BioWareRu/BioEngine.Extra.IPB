@@ -62,7 +62,6 @@ namespace BioEngine.Extra.IPB.Controllers
                     var comment = await _dbContext.Set<IPBComment>().Where(c => c.PostId == post.Id)
                                       .FirstOrDefaultAsync() ?? new IPBComment
                                   {
-                                      Type = record.Type,
                                       ContentId = record.ContentId,
                                       AuthorId = post.Author.Id ?? 0,
                                       PostId = post.Id,

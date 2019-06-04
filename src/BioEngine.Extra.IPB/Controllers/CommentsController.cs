@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
-using BioEngine.Core.Entities;
 using BioEngine.Extra.IPB.Entities;
 using BioEngine.Extra.IPB.Publishing;
 using JetBrains.Annotations;
@@ -54,7 +53,6 @@ namespace BioEngine.Extra.IPB.Controllers
                 var comment = await _dbContext.Set<IPBComment>().Where(c => c.PostId == commentData.Id)
                                   .FirstOrDefaultAsync() ?? new IPBComment
                               {
-                                  Type = settings.Type,
                                   ContentId = settings.ContentId,
                                   AuthorId = commentData.AuthorId,
                                   PostId = commentData.Id,
@@ -70,24 +68,7 @@ namespace BioEngine.Extra.IPB.Controllers
                     _dbContext.Update(comment);
                 }
 
-                IContentEntity? entity = null;
-                if (settings.Type == typeof(Post).FullName)
-                {
-                    entity =
-                        await _dbContext.Posts.Where(p => p.Id == settings.ContentId).FirstOrDefaultAsync();
-                }
-
-                if (settings.Type == typeof(Page).FullName)
-                {
-                    entity =
-                        await _dbContext.Pages.Where(p => p.Id == settings.ContentId).FirstOrDefaultAsync();
-                }
-
-                if (settings.Type == typeof(Section).FullName)
-                {
-                    entity = await _dbContext.Sections.Where(s => s.Id == settings.ContentId)
-                        .FirstOrDefaultAsync();
-                }
+                var entity = await _dbContext.ContentItems.Where(c => c.Id == settings.ContentId).FirstOrDefaultAsync();
 
                 if (entity != null)
                 {
