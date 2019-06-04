@@ -10,7 +10,6 @@ namespace BioEngine.Extra.IPB.Entities
         [NotMapped] public override string Title { get; set; }
         [NotMapped] public override string Url { get; set; }
         [Required] public int PostId { get; set; }
-        [NotMapped] public override string PublicUrl { get; set; } = "#";
     }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized.
 }
