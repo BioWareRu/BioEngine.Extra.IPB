@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BioEngine.Core.Users;
+using BioEngine.Core.Abstractions;
 using BioEngine.Extra.IPB.Models;
 
 namespace BioEngine.Extra.IPB.Auth

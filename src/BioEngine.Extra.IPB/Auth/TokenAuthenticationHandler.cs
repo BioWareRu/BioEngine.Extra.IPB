@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using BioEngine.Core.Users;
+using BioEngine.Core.Abstractions;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Models;
 using JetBrains.Annotations;

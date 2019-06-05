@@ -1,6 +1,6 @@
 using System;
 using System.Security.Claims;
-using BioEngine.Core.Users;
+using BioEngine.Core.Abstractions;
 using BioEngine.Extra.IPB.Api;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
