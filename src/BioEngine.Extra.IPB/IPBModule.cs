@@ -1,7 +1,6 @@
 using System;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Comments;
-using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Modules;
 using BioEngine.Core.Properties;
@@ -9,7 +8,6 @@ using BioEngine.Core.Social;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Auth;
 using BioEngine.Extra.IPB.Comments;
-using BioEngine.Extra.IPB.Entities;
 using BioEngine.Extra.IPB.Properties;
 using BioEngine.Extra.IPB.Publishing;
 using BioEngine.Extra.IPB.Users;
@@ -19,7 +17,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Extra.IPB
 {
-    public abstract class IPBModule : BioEngineModule<IPBModuleConfig>
+    public abstract class IPBModule : BaseBioEngineModule<IPBModuleConfig>
     {
         protected override void CheckConfig()
         {
@@ -38,12 +36,6 @@ namespace BioEngine.Extra.IPB
             services.AddSingleton(Config);
             services.AddSingleton<IPBApiClientFactory>();
             services.AddScoped<IUserDataProvider, IPBUserDataProvider>();
-        }
-
-        public override void ConfigureDbContext(BioEntitiesManager entitiesManager)
-        {
-            entitiesManager.Register<IPBPublishRecord>();
-            entitiesManager.Register<IPBComment>();
         }
     }
 

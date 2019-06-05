@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Extra.IPB
 {
-    public class IPBAuthModule : BioEngineModule
+    public class IPBAuthModule : BaseBioEngineModule
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
