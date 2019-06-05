@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Publishers;
+using BioEngine.Core.Social;
 using BioEngine.Core.Web;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Models;

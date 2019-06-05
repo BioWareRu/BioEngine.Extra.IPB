@@ -4,7 +4,7 @@ using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Modules;
 using BioEngine.Core.Properties;
-using BioEngine.Core.Publishers;
+using BioEngine.Core.Social;
 using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Auth;
