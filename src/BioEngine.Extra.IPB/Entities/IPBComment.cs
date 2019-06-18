@@ -8,7 +8,6 @@ namespace BioEngine.Extra.IPB.Entities
     public class IPBComment : BaseComment
     {
         [NotMapped] public override string Title { get; set; }
-        [NotMapped] public override string Url { get; set; }
         [Required] public int PostId { get; set; }
     }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized.
