@@ -3,6 +3,7 @@ pool:
 
 variables:
     Version: 3.0.$(Build.BuildId)
+    
 steps:
     - task: UseDotNet@2
       displayName: 'Install .Net Core 3.0'
