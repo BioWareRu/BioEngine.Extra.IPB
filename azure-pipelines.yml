@@ -41,13 +41,21 @@ steps:
           packDirectory: '$(build.artifactStagingDirectory)'
 
     - task: DotNetCoreCLI@2
-      displayName: 'Push package'
+      displayName: 'Push package to internal feed'
       inputs:
           command: push
           nuGetFeedType: 'internal'
           publishVstsFeed: 'BioEngine'
           versioningScheme: byEnvVar
           versionEnvVar: 'Version'
+          
+    - task: NuGetCommand@2
+      displayName: 'Push package to nuget'
+      inputs:
+          command: 'push'
+          packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+          nuGetFeedType: 'external'
+          publishFeedCredentials: 'BRC Nuget'
           
     - task: PublishPipelineArtifact@0
       displayName: 'Publish package as artifact'
