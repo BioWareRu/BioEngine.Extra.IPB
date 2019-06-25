@@ -6,20 +6,20 @@
     <NullableContextOptions>enable</NullableContextOptions>
   </PropertyGroup>
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Flurl.Http" Version="2.4.2"/>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2"/>
-    <PackageReference Include="BioEngine.Core" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core')"/>
-    <PackageReference Include="BioEngine.Core.API" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core.API')"/>
-    <PackageReference Include="BioEngine.Core.Social" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core')"/>
-    <PackageReference Include="BioEngine.Core.Comments" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core')"/>
+    <PackageReference Include="Flurl.Http" Version="2.4.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="BioEngine.Core" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core')" />
+    <PackageReference Include="BioEngine.Core.API" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core.API')" />
+    <PackageReference Include="BioEngine.Core.Social" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core')" />
+    <PackageReference Include="BioEngine.Core.Comments" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core')" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BioEngine.Core\src\BioEngine.Core\BioEngine.Core.csproj" Condition="Exists('..\..\..\BioEngine.Core')"/>
-    <ProjectReference Include="..\..\..\BioEngine.Core.API\src\BioEngine.Core.API\BioEngine.Core.API.csproj" Condition="Exists('..\..\..\BioEngine.Core.API')"/>
-    <ProjectReference Include="..\..\..\BioEngine.Core\src\BioEngine.Core.Social\BioEngine.Core.Social.csproj" Condition="Exists('..\..\..\BioEngine.Core')"/>
-    <ProjectReference Include="..\..\..\BioEngine.Core\src\BioEngine.Core.Comments\BioEngine.Core.Comments.csproj" Condition="Exists('..\..\..\BioEngine.Core')"/>
+    <ProjectReference Include="..\..\..\BioEngine.Core\src\BioEngine.Core\BioEngine.Core.csproj" Condition="Exists('..\..\..\BioEngine.Core')" />
+    <ProjectReference Include="..\..\..\BioEngine.Core.API\src\BioEngine.Core.API\BioEngine.Core.API.csproj" Condition="Exists('..\..\..\BioEngine.Core.API')" />
+    <ProjectReference Include="..\..\..\BioEngine.Core\src\BioEngine.Core.Social\BioEngine.Core.Social.csproj" Condition="Exists('..\..\..\BioEngine.Core')" />
+    <ProjectReference Include="..\..\..\BioEngine.Core\src\BioEngine.Core.Comments\BioEngine.Core.Comments.csproj" Condition="Exists('..\..\..\BioEngine.Core')" />
   </ItemGroup>
 </Project>

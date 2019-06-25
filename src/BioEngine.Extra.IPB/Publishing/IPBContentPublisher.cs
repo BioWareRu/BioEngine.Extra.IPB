@@ -23,10 +23,11 @@ namespace BioEngine.Extra.IPB.Publishing
             _contentRender = contentRender;
         }
 
-        protected override async Task<IPBPublishRecord> DoPublishAsync(ContentItem entity, Site site,
+        protected override async Task<IPBPublishRecord> DoPublishAsync(IPBPublishRecord record, ContentItem entity,
+            Site site,
             IPBPublishConfig config)
         {
-            return await CreateOrUpdateContentPostAsync(entity, site, config);
+            return await CreateOrUpdateContentPostAsync(record, entity, site, config);
         }
 
         protected override async Task<bool> DoDeleteAsync(IPBPublishRecord record, IPBPublishConfig config)
@@ -38,7 +39,8 @@ namespace BioEngine.Extra.IPB.Publishing
             return result.Hidden;
         }
 
-        private async Task<IPBPublishRecord> CreateOrUpdateContentPostAsync(ContentItem item, Site site,
+        private async Task<IPBPublishRecord> CreateOrUpdateContentPostAsync(IPBPublishRecord record, ContentItem item,
+            Site site,
             IPBPublishConfig config)
         {
             if (_contentRender == null)
@@ -47,10 +49,6 @@ namespace BioEngine.Extra.IPB.Publishing
             }
 
             var apiClient = _apiClientFactory.GetClient(config.AccessToken);
-            var record = await GetRecordAsync(item) ?? new IPBPublishRecord
-            {
-                ContentId = item.Id, Type = item.GetType().FullName
-            };
 
             if (record.TopicId == 0)
             {
