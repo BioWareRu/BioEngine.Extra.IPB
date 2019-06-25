@@ -16,12 +16,6 @@ stages:
                       includePreviewVersions: true
 
                 - task: DotNetCoreCLI@2
-                  inputs:
-                      command: test
-                      publishTestResults: true
-                      projects: 'tests/**/*.csproj'
-
-                - task: DotNetCoreCLI@2
                   displayName: 'Create package'
                   inputs:
                       command: pack
