@@ -1,64 +1,67 @@
-pool:
-    vmImage: 'Ubuntu 16.04'
-
 variables:
     Version: 3.0.$(Build.BuildId)
-    
-steps:
-    - task: UseDotNet@2
-      displayName: 'Install .Net Core 3.0'
-      inputs:
-          packageType: sdk
-          version: 3.0.100-preview6-012264
-          includePreviewVersions: true
-          
-    - task: DotNetCoreCLI@2
-      displayName: 'Restore packages'
-      inputs:
-          command: restore
-          projects: '**/*.csproj'
-          feedsToUse: 'select'
-          verbosityRestore: 'minimal'
-          vstsFeed: 'BioEngine'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Build project'
-      inputs:
-          command: custom
-          custom: build
-          arguments: '--no-restore -c Release'
-          projects: '**/*.csproj'
+stages:
+    - stage: Build
+      jobs:
+          - job: Build
+            pool:
+                vmImage: Ubuntu 16.04
+            steps:
+                - task: UseDotNet@2
+                  displayName: 'Install .Net Core 3.0'
+                  inputs:
+                      packageType: sdk
+                      version: 3.0.100-preview6-012264
+                      includePreviewVersions: true
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Create package'
-      inputs:
-          command: pack
-          nobuild: true
-          configuration: 'Release'
-          versioningScheme: byEnvVar
-          versionEnvVar: 'Version'
-          verbosityPack: 'minimal'
-          packDirectory: '$(build.artifactStagingDirectory)'
+                - task: DotNetCoreCLI@2
+                  inputs:
+                      command: test
+                      publishTestResults: true
+                      projects: 'tests/**/*.csproj'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Push package to internal feed'
-      inputs:
-          command: push
-          nuGetFeedType: 'internal'
-          publishVstsFeed: 'BioEngine'
-          versioningScheme: byEnvVar
-          versionEnvVar: 'Version'
-          
-    - task: NuGetCommand@2
-      displayName: 'Push package to nuget'
-      inputs:
-          command: 'push'
-          packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
-          nuGetFeedType: 'external'
-          publishFeedCredentials: 'BRC Nuget'
-          
-    - task: PublishPipelineArtifact@0
-      displayName: 'Publish package as artifact'
-      inputs:
-          artifactName: 'packages'
-          targetPath: '$(Build.ArtifactStagingDirectory)'
+                - task: DotNetCoreCLI@2
+                  displayName: 'Create package'
+                  inputs:
+                      command: pack
+                      configuration: Release
+                      versioningScheme: byEnvVar
+                      versionEnvVar: Version
+                      verbosityPack: minimal
+                      projects: src/**/*.csproj
+
+                - task: PublishPipelineArtifact@0
+                  displayName: 'Publish package as artifact'
+                  inputs:
+                      artifactName: 'packages'
+                      targetPath: '$(Build.ArtifactStagingDirectory)'
+
+    - stage: Deploy
+      dependsOn: Build
+      condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+      jobs:
+          - job: Publish
+            pool:
+                vmImage: Ubuntu 16.04
+            steps:
+                - download: current
+                  artifact: packages
+
+                - task: DotNetCoreCLI@2
+                  displayName: 'Push package to internal feed'
+                  inputs:
+                      command: push
+                      nuGetFeedType: internal
+                      publishVstsFeed: BioEngine
+                      versioningScheme: byEnvVar
+                      versionEnvVar: Version
+                      searchPatternPush: '$(Pipeline.Workspace)/**/*.nupkg'
+
+                - task: NuGetCommand@2
+                  displayName: 'Push package to nuget'
+                  inputs:
+                      command: 'push'
+                      packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg'
+                      nuGetFeedType: 'external'
+                      publishFeedCredentials: 'BRC Nuget'
