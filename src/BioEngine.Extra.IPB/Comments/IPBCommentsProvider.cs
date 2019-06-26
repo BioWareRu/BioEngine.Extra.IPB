@@ -19,14 +19,16 @@ namespace BioEngine.Extra.IPB.Comments
     public class IPBCommentsProvider : BaseCommentsProvider
     {
         private readonly IPBModuleConfig _options;
+        private readonly BioEntitiesManager _entitiesManager;
 
         public IPBCommentsProvider(BioContext dbContext,
             ILogger<ICommentsProvider> logger,
             IPBModuleConfig options,
-            IUserDataProvider userDataProvider)
+            IUserDataProvider userDataProvider, BioEntitiesManager entitiesManager)
             : base(dbContext, userDataProvider, logger)
         {
             _options = options;
+            _entitiesManager = entitiesManager;
         }
 
 
@@ -38,7 +40,7 @@ namespace BioEngine.Extra.IPB.Comments
         [SuppressMessage("ReSharper", "RCS1198")]
         public override async Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(ContentItem[] entities)
         {
-            var types = entities.Select(e => e.GetType().FullName).Distinct().ToArray();
+            var types = entities.Select(e => _entitiesManager.GetKey(e)).Distinct().ToArray();
             var ids = entities.Select(e => e.Id).ToArray();
 
             var contentSettings = await DbContext.Set<IPBPublishRecord>()
@@ -50,7 +52,7 @@ namespace BioEngine.Extra.IPB.Comments
             {
                 Uri? uri = null;
                 var settings = contentSettings.FirstOrDefault(c =>
-                    c.Type == entity.GetType().FullName && c.ContentId == entity.Id);
+                    c.Type == _entitiesManager.GetKey(entity) && c.ContentId == entity.Id);
                 if (settings?.TopicId > 0)
                 {
                     uri = new Uri(

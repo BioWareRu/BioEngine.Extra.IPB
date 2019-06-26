@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.Comments;
+using BioEngine.Core.DB;
 
 namespace BioEngine.Extra.IPB.Entities
 {
 #pragma warning disable CS8618 // Non-nullable field is uninitialized.
+    [Entity("ipbcomments")]
     public class IPBComment : BaseComment
     {
         [NotMapped] public override string Title { get; set; }

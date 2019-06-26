@@ -17,7 +17,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Extra.IPB
 {
-    public abstract class IPBModule : BaseBioEngineModule<IPBModuleConfig>
+    public abstract class IPBModule<TConfig> : BaseBioEngineModule<TConfig> where TConfig : IPBModuleConfig
     {
         protected override void CheckConfig()
         {
@@ -33,6 +33,7 @@ namespace BioEngine.Extra.IPB
             PropertiesProvider.RegisterBioEngineProperties<IPBSitePropertiesSet, Site>("ipbsite");
 
 
+            services.AddSingleton(typeof(IPBModuleConfig), Config);
             services.AddSingleton(Config);
             services.AddSingleton<IPBApiClientFactory>();
             services.AddScoped<IUserDataProvider, IPBUserDataProvider>();
@@ -62,7 +63,7 @@ namespace BioEngine.Extra.IPB
         public string IntegrationKey { get; set; } = "";
     }
 
-    public class IPBSiteModule : IPBModule
+    public class IPBSiteModule : IPBModule<IPBModuleConfig>
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
@@ -73,7 +74,16 @@ namespace BioEngine.Extra.IPB
         }
     }
 
-    public class IPBApiModule : IPBModule
+    public class IPBApiModuleConfig : IPBModuleConfig
+    {
+        public bool EnableAuth { get; set; }
+
+        public IPBApiModuleConfig(Uri url) : base(url)
+        {
+        }
+    }
+
+    public class IPBApiModule : IPBModule<IPBApiModuleConfig>
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
@@ -83,6 +93,13 @@ namespace BioEngine.Extra.IPB
             services.AddScoped<IContentPublisher<IPBPublishConfig>, IPBContentPublisher>();
             services.AddScoped<IPBContentPublisher>();
             services.AddScoped<IPropertiesOptionsResolver, IPBSectionPropertiesOptionsResolver>();
+
+            if (Config.EnableAuth)
+            {
+                services
+                    .AddAuthentication("ipbToken")
+                    .AddScheme<IPBTokenAuthOptions, TokenAuthenticationHandler>("ipbToken", null);
+            }
         }
     }
 }
