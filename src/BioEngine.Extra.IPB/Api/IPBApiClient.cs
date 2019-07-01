@@ -106,9 +106,9 @@ namespace BioEngine.Extra.IPB.Api
             return GetAsync<Response<Forum>>($"forums/forums?page={page.ToString()}&perPage={perPage.ToString()}");
         }
 
-        public Task<User> GetUserByIdAsync(int id)
+        public Task<User> GetUserByIdAsync(string id)
         {
-            return GetAsync<User>($"core/members/{id.ToString()}");
+            return GetAsync<User>($"core/members/{id}");
         }
 
         public Task<Topic> GetTopicAsync(int topicId)

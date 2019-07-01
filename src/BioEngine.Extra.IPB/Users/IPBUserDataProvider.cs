@@ -22,22 +22,22 @@ namespace BioEngine.Extra.IPB.Users
             _logger = logger;
         }
 
-        private static string GetCacheKey(int userId)
+        private static string GetCacheKey(string userId)
         {
-            return $"ipbuserdata{userId.ToString()}";
+            return $"ipbuserdata{userId}";
         }
 
-        private List<IUser> GetFromCache(IEnumerable<int> userIds)
+        private List<IUser> GetFromCache(IEnumerable<string> userIds)
         {
             _logger.LogTrace("Get user data from cache");
             return userIds.Select(GetCacheKey).Select(key => _memoryCache.Get<IUser>(key))
                 .Where(userData => userData != null).ToList();
         }
 
-        public async Task<List<IUser>> GetDataAsync(int[] userIds)
+        public async Task<List<IUser>> GetDataAsync(string[] userIds)
         {
             var data = GetFromCache(userIds);
-            var notFoundUserIds = userIds.Where(id => data.All(ud => ud.Id != id) && id > 0).ToArray();
+            var notFoundUserIds = userIds.Where(id => data.All(ud => ud.Id != id) && !string.IsNullOrEmpty(id)).ToArray();
             if (notFoundUserIds.Length > 0)
             {
                 _logger.LogTrace("Load users data from api");

@@ -6,7 +6,6 @@ using BioEngine.Core.Properties;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Models;
 using JetBrains.Annotations;
-using Microsoft.AspNetCore.Http;
 
 namespace BioEngine.Extra.IPB.Properties
 {
@@ -20,13 +19,15 @@ namespace BioEngine.Extra.IPB.Properties
     [UsedImplicitly]
     public class IPBSectionPropertiesOptionsResolver : IPropertiesOptionsResolver
     {
-        private readonly IPBApiClient _apiClient;
+        private readonly IPBApiClientFactory _apiClientFactory;
+        private readonly ICurrentUserProvider _currentUserProvider;
+        private IPBApiClient _apiClient;
 
         public IPBSectionPropertiesOptionsResolver(IPBApiClientFactory apiClientFactory,
-            IHttpContextAccessor httpContextAccessor)
+            ICurrentUserProvider currentUserProvider)
         {
-            _apiClient =
-                apiClientFactory.GetClient(httpContextAccessor.HttpContext.Features.Get<ICurrentUserFeature>().Token);
+            _apiClientFactory = apiClientFactory;
+            _currentUserProvider = currentUserProvider;
         }
 
         public bool CanResolve(PropertiesSet properties)
@@ -34,12 +35,17 @@ namespace BioEngine.Extra.IPB.Properties
             return properties is IPBSitePropertiesSet;
         }
 
+        private async Task<IPBApiClient> GetClientAsync()
+        {
+            return _apiClient ??= _apiClientFactory.GetClient(await _currentUserProvider.GetAccessTokenAsync());
+        }
+
         public async Task<List<PropertiesOption>?> ResolveAsync(PropertiesSet properties, string property)
         {
             switch (property)
             {
                 case "ForumId":
-                    var response = await _apiClient.GetForumsAsync(1, 1000);
+                    var response = await (await GetClientAsync()).GetForumsAsync(1, 1000);
                     var roots = response.Results.Where(f => f.ParentId == null).ToList();
                     var forums = new List<Forum>();
                     foreach (var forum in roots)

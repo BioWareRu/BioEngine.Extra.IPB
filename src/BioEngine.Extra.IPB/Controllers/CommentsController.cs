@@ -115,7 +115,7 @@ namespace BioEngine.Extra.IPB.Controllers
         public int Id { get; set; }
         public int TopicId { get; set; }
         public int ForumId { get; set; }
-        public int AuthorId { get; set; }
+        public string AuthorId { get; set; }
         public long Timestamp { get; set; }
     }
 }

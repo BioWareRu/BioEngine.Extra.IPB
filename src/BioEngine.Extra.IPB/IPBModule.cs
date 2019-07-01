@@ -23,7 +23,7 @@ namespace BioEngine.Extra.IPB
         {
             if (Config.Url == null)
             {
-                throw new ArgumentException($"IPB url is not set");
+                throw new ArgumentException("IPB url is not set");
             }
         }
 
@@ -70,6 +70,7 @@ namespace BioEngine.Extra.IPB
         {
             base.ConfigureServices(services, configuration, environment);
             services.AddScoped<ICommentsProvider, IPBCommentsProvider>();
+            services.AddScoped<ICurrentUserProvider, IPBSiteCurrentUserProvider>();
             services.AddIpbOauthAuthentication(Config);
         }
     }
@@ -93,6 +94,7 @@ namespace BioEngine.Extra.IPB
             services.AddScoped<IContentPublisher<IPBPublishConfig>, IPBContentPublisher>();
             services.AddScoped<IPBContentPublisher>();
             services.AddScoped<IPropertiesOptionsResolver, IPBSectionPropertiesOptionsResolver>();
+            services.AddScoped<ICurrentUserProvider, IPBApiCurrentUserProvider>();
 
             if (Config.EnableAuth)
             {

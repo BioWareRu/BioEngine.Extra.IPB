@@ -1,10 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using BioEngine.Core.Abstractions;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Models;
 using JetBrains.Annotations;
@@ -49,8 +47,7 @@ namespace BioEngine.Extra.IPB.Auth
                         var user = await GetUserAsync(tokenString);
                         if (user != null)
                         {
-                            var userTicket = AuthenticationTicket(user);
-                            Context.Features.Set<ICurrentUserFeature>(new CurrentUserFeature(user, tokenString));
+                            var userTicket = AuthenticationTicket(user, tokenString);
                             result = AuthenticateResult.Success(userTicket);
                         }
                         else
@@ -66,26 +63,10 @@ namespace BioEngine.Extra.IPB.Auth
             return result;
         }
 
-        private AuthenticationTicket AuthenticationTicket(User user)
+        private AuthenticationTicket AuthenticationTicket(User user, string token)
         {
             var identity = new ClaimsIdentity("token");
-            identity.AddClaim(new Claim("Id", user.Id.ToString()));
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Name));
-            var groups = user.GetGroupIds();
-            if (groups.Contains(_ipbApiOptions.AdminGroupId))
-            {
-                identity.AddClaim(new Claim(ClaimTypes.Role, "admin"));
-            }
-
-            if (groups.Contains(_ipbApiOptions.PublisherGroupId))
-            {
-                identity.AddClaim(new Claim(ClaimTypes.Role, "publisher"));
-            }
-
-            if (groups.Contains(_ipbApiOptions.EditorGroupId))
-            {
-                identity.AddClaim(new Claim(ClaimTypes.Role, "editor"));
-            }
+            IpbAuthHelper.InsertClaims(user, identity, "", token, _ipbApiOptions);
 
             var userTicket =
                 new AuthenticationTicket(new ClaimsPrincipal(identity), null, "token");
@@ -96,14 +77,13 @@ namespace BioEngine.Extra.IPB.Auth
         {
             var user = new User
             {
-                Id = 1,
+                Id = "1",
                 Name = "Sonic",
                 PhotoUrl = "/assets/img/avatar.png",
                 ProfileUrl = "#",
                 PrimaryGroup = new Group {Id = _ipbApiOptions.AdminGroupId}
             };
-            var userTicket = AuthenticationTicket(user);
-            Context.Features.Set<ICurrentUserFeature>(new CurrentUserFeature(user, token));
+            var userTicket = AuthenticationTicket(user, token);
             return AuthenticateResult.Success(userTicket);
         }
 
@@ -126,18 +106,6 @@ namespace BioEngine.Extra.IPB.Auth
         {
             var apiClient = _apiClientFactory.GetClient(token);
             return await apiClient.GetUserAsync();
-        }
-    }
-
-    public class CurrentUserFeature : ICurrentUserFeature
-    {
-        public IUser User { get; }
-        public string Token { get; }
-
-        public CurrentUserFeature(IUser user, string token)
-        {
-            User = user;
-            Token = token;
         }
     }
 }

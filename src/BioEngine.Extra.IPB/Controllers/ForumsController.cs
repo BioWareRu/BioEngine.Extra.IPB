@@ -14,12 +14,12 @@ namespace BioEngine.Extra.IPB.Controllers
         public ForumsController(BaseControllerContext context, IPBApiClientFactory factory) : base(context, factory)
         {
         }
-        
+
         [HttpGet]
         public async Task<ActionResult<ListResponse<Forum>>> GetAsync(int offset = 1, int limit = 25)
         {
             var page = offset / limit + 1;
-            var response = await Client.GetForumsAsync(page, limit);
+            var response = await (await GetClientAsync()).GetForumsAsync(page, limit);
             var roots = response.Results.Where(f => f.ParentId == null).ToList();
             var forums = new List<Forum>();
             foreach (var forum in roots)

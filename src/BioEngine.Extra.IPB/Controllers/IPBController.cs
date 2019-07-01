@@ -1,4 +1,5 @@
-﻿using BioEngine.Core.Web;
+﻿using System.Threading.Tasks;
+using BioEngine.Core.Web;
 using BioEngine.Extra.IPB.Api;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,11 @@ namespace BioEngine.Extra.IPB.Controllers
             _factory = factory;
         }
 
-        protected IPBApiClient Client => _factory.GetClient(CurrentToken);
+        protected async Task<IPBApiClient> GetClientAsync()
+        {
+            return _factory.GetClient(await CurrentToken);
+        }
+
         protected IPBApiClient ReadOnlyClient => _factory.GetReadOnlyClient();
     }
 }

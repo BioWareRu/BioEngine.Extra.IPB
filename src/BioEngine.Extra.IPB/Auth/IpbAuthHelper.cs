@@ -1,6 +1,6 @@
 using System;
+using System.Linq;
 using System.Security.Claims;
-using BioEngine.Core.Abstractions;
 using BioEngine.Extra.IPB.Api;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -42,23 +42,42 @@ namespace BioEngine.Extra.IPB.Auth
                 });
         }
 
-        private static void InsertClaims(IUser userInfo, ClaimsIdentity identity, string claimsIssuer)
+        public static void InsertClaims(User user, ClaimsIdentity identity, string issuer, string token = null,
+            IPBModuleConfig options = null)
         {
-            if (userInfo.Id > 0)
-                identity.AddClaim(
-                    new Claim(ClaimTypes.NameIdentifier, userInfo.Id.ToString(), ClaimValueTypes.String, claimsIssuer));
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
+            identity.AddClaim(new Claim(ClaimTypes.Name, user.Name));
+            identity.AddClaim(new Claim("photo", user.PhotoUrl));
+            identity.AddClaim(new Claim(ClaimTypes.Webpage, user.ProfileUrl));
+            if (!string.IsNullOrEmpty(token))
+            {
+                identity.AddClaim(new Claim("ipbToken", token));
+            }
 
-            if (!string.IsNullOrEmpty(userInfo.Name))
-                identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, userInfo.Name,
-                    ClaimValueTypes.String,
-                    claimsIssuer));
+            var groups = user.GetGroupIds();
+            identity.AddClaim(new Claim(ClaimTypes.PrimaryGroupSid, user.PrimaryGroup.Id.ToString()));
+            foreach (var group in groups)
+            {
+                identity.AddClaim(new Claim(ClaimTypes.GroupSid, group.ToString()));
+            }
 
-            if (!string.IsNullOrEmpty(userInfo.ProfileUrl))
-                identity.AddClaim(new Claim(ClaimTypes.Webpage, userInfo.ProfileUrl, ClaimValueTypes.String,
-                    claimsIssuer));
+            if (options != null)
+            {
+                if (groups.Contains(options.AdminGroupId))
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.Role, "admin"));
+                }
 
-            if (!string.IsNullOrEmpty(userInfo.PhotoUrl))
-                identity.AddClaim(new Claim("avatarUrl", userInfo.PhotoUrl, ClaimValueTypes.String, claimsIssuer));
+                if (groups.Contains(options.PublisherGroupId))
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.Role, "publisher"));
+                }
+
+                if (groups.Contains(options.EditorGroupId))
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.Role, "editor"));
+                }
+            }
         }
     }
 }

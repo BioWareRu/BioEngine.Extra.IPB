@@ -63,7 +63,7 @@ namespace BioEngine.Extra.IPB.Controllers
                                       .FirstOrDefaultAsync() ?? new IPBComment
                                   {
                                       ContentId = record.ContentId,
-                                      AuthorId = post.Author?.Id ?? 0,
+                                      AuthorId = post.Author?.Id,
                                       PostId = post.Id,
                                       DateAdded = post.Date
                                   };
