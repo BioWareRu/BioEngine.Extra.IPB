@@ -16,15 +16,6 @@ stages:
                       includePreviewVersions: true
 
                 - task: DotNetCoreCLI@2
-                  displayName: 'Restore packages'
-                  inputs:
-                      command: restore
-                      projects: '**/*.csproj'
-                      feedsToUse: 'select'
-                      verbosityRestore: 'minimal'
-                      vstsFeed: 'BioEngine'
-
-                - task: DotNetCoreCLI@2
                   displayName: 'Create package'
                   inputs:
                       command: pack
@@ -33,6 +24,7 @@ stages:
                       versionEnvVar: Version
                       verbosityPack: minimal
                       projects: src/**/*.csproj
+                      feedRestore: 'BioEngine'
 
                 - task: PublishPipelineArtifact@0
                   displayName: 'Publish package as artifact'
