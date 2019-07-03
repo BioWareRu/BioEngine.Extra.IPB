@@ -37,7 +37,8 @@ namespace BioEngine.Extra.IPB.Users
         public async Task<List<IUser>> GetDataAsync(string[] userIds)
         {
             var data = GetFromCache(userIds);
-            var notFoundUserIds = userIds.Where(id => data.All(ud => ud.Id != id) && !string.IsNullOrEmpty(id)).ToArray();
+            var notFoundUserIds = userIds
+                .Where(id => data.All(ud => ud.Id != id) && !string.IsNullOrEmpty(id) && id != "0").ToArray();
             if (notFoundUserIds.Length > 0)
             {
                 _logger.LogTrace("Load users data from api");
