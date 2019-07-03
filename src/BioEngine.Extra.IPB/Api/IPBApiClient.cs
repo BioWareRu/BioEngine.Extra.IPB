@@ -121,10 +121,14 @@ namespace BioEngine.Extra.IPB.Api
             return GetAsync<Topic>($"forums/topics/{topicId.ToString()}");
         }
 
-        public Task<Response<Post>> GetForumsPostsAsync(int[] forumIds = null, string orderBy = "id",
+        public Task<Response<Post>> GetForumsPostsAsync(int[] forumIds = null, string orderBy = null,
             bool orderDescending = false, int page = 1, int perPage = 100)
         {
-            var url = $"forums/posts?page={page.ToString()}&perPage={perPage.ToString()}&sortBy={orderBy}";
+            var url = $"forums/posts?page={page.ToString()}&perPage={perPage.ToString()}";
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                url += $"&sortBy={orderBy}";
+            }
             if (orderDescending)
             {
                 url += "&sortDir=desc";
