@@ -59,7 +59,7 @@ namespace BioEngine.Extra.IPB.Comments
 
                 while (true)
                 {
-                    var response = await client.GetForumsPostsAsync(forumIds.ToArray(), "lastPost", true, page);
+                    var response = await client.GetForumsPostsAsync(forumIds.ToArray(), "lastPost", true, page, 1000);
                     posts.AddRange(response.Results);
                     var lastPostId = response.Results.OrderBy(p => p.Id).Select(p => p.Id).First();
                     if (page < response.TotalPages && lastPostId > lastCommentId)
@@ -101,7 +101,7 @@ namespace BioEngine.Extra.IPB.Comments
 
                     while (true)
                     {
-                        var response = await client.GetTopicPostsAsync(record.TopicId, page, 100);
+                        var response = await client.GetTopicPostsAsync(record.TopicId, page, 1000);
                         posts.AddRange(response.Results);
                         foreach (var post in response.Results)
                         {
