@@ -33,10 +33,11 @@ namespace BioEngine.Extra.IPB.Auth
                         OnCreatingTicket = async context =>
                         {
                             var factory = context.HttpContext.RequestServices.GetRequiredService<IPBApiClientFactory>();
+                            var ipbOptions = context.HttpContext.RequestServices.GetRequiredService<IPBModuleConfig>();
                             var ipbApiClient = factory.GetClient(context.AccessToken);
                             var user = await ipbApiClient.GetUserAsync();
 
-                            InsertClaims(user, context.Identity, context.Options.ClaimsIssuer);
+                            InsertClaims(user, context.Identity, context.Options.ClaimsIssuer, options: ipbOptions);
                         }
                     };
                 });

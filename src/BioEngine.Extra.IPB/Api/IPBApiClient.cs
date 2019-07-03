@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using BioEngine.Extra.IPB.Auth;
 using BioEngine.Extra.IPB.Models;
@@ -18,21 +19,23 @@ namespace BioEngine.Extra.IPB.Api
     {
         private readonly IPBModuleConfig _options;
         private readonly ILogger<IPBApiClient> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public IPBApiClientFactory(IPBModuleConfig options, ILogger<IPBApiClient> logger)
+        public IPBApiClientFactory(IPBModuleConfig options, ILogger<IPBApiClient> logger, IHttpClientFactory httpClientFactory)
         {
             _options = options;
             _logger = logger;
+            _httpClientFactory = httpClientFactory;
         }
 
         public IPBApiClient GetClient(string token)
         {
-            return new IPBApiClient(_options, token, _logger);
+            return new IPBApiClient(_options, token, _logger, _httpClientFactory);
         }
 
         public IPBApiClient GetReadOnlyClient()
         {
-            return new IPBApiClient(_options, null, _logger);
+            return new IPBApiClient(_options, null, _logger, _httpClientFactory);
         }
     }
 
@@ -41,12 +44,14 @@ namespace BioEngine.Extra.IPB.Api
         private readonly IPBModuleConfig _config;
         private readonly string? _token;
         private readonly ILogger<IPBApiClient> _logger;
+        private readonly FlurlClient _flurlClient;
 
-        public IPBApiClient(IPBModuleConfig config, string? token, ILogger<IPBApiClient> logger)
+        public IPBApiClient(IPBModuleConfig config, string? token, ILogger<IPBApiClient> logger, IHttpClientFactory httpClientFactory)
         {
             _config = config;
             _token = token;
             _logger = logger;
+            _flurlClient = new FlurlClient(httpClientFactory.CreateClient());
         }
 
         public Task<User> GetUserAsync()
@@ -56,7 +61,7 @@ namespace BioEngine.Extra.IPB.Api
 
         private IFlurlRequest GetRequest(string url)
         {
-            var requestUrl = new FlurlRequest($"{_config.ApiUrl}/{url}");
+            var requestUrl = new FlurlRequest($"{_config.ApiUrl}/{url}").WithClient(_flurlClient);
             if (!string.IsNullOrEmpty(_token))
             {
                 requestUrl.WithOAuthBearerToken(_token);
@@ -116,9 +121,27 @@ namespace BioEngine.Extra.IPB.Api
             return GetAsync<Topic>($"forums/topics/{topicId.ToString()}");
         }
 
-        public Task<Response<Post>> GetPostsAsync(int topicId,int page = 1, int perPage = 25)
+        public Task<Response<Post>> GetForumsPostsAsync(int[] forumIds = null, string orderBy = "id",
+            bool orderDescending = false, int page = 1, int perPage = 100)
         {
-            return GetAsync<Response<Post>>($"forums/topics/{topicId.ToString()}/posts?page={page.ToString()}&perPage={perPage.ToString()}");
+            var url = $"forums/posts?page={page.ToString()}&perPage={perPage.ToString()}&sortBy={orderBy}";
+            if (orderDescending)
+            {
+                url += "&sortDir=desc";
+            }
+
+            if (forumIds != null && forumIds.Any())
+            {
+                url += $"&forums={string.Join(',', forumIds)}";
+            }
+
+            return GetAsync<Response<Post>>(url);
+        }
+
+        public Task<Response<Post>> GetTopicPostsAsync(int topicId, int page = 1, int perPage = 25)
+        {
+            return GetAsync<Response<Post>>(
+                $"forums/topics/{topicId.ToString()}/posts?page={page.ToString()}&perPage={perPage.ToString()}");
         }
     }
 

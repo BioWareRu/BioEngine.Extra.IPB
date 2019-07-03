@@ -37,6 +37,8 @@ namespace BioEngine.Extra.IPB
             services.AddSingleton(Config);
             services.AddSingleton<IPBApiClientFactory>();
             services.AddScoped<IUserDataProvider, IPBUserDataProvider>();
+            services.AddScoped<IPBCommentsSynchronizer>();
+            services.AddHttpClient();
         }
     }
 
@@ -59,8 +61,6 @@ namespace BioEngine.Extra.IPB
         public string AuthorizationEndpoint { get; set; } = "";
         public string TokenEndpoint { get; set; } = "";
         public string ApiReadonlyKey { get; set; } = "";
-
-        public string IntegrationKey { get; set; } = "";
     }
 
     public class IPBSiteModule : IPBModule<IPBModuleConfig>
