@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -21,7 +22,8 @@ namespace BioEngine.Extra.IPB.Api
         private readonly ILogger<IPBApiClient> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public IPBApiClientFactory(IPBModuleConfig options, ILogger<IPBApiClient> logger, IHttpClientFactory httpClientFactory)
+        public IPBApiClientFactory(IPBModuleConfig options, ILogger<IPBApiClient> logger,
+            IHttpClientFactory httpClientFactory)
         {
             _options = options;
             _logger = logger;
@@ -46,7 +48,8 @@ namespace BioEngine.Extra.IPB.Api
         private readonly ILogger<IPBApiClient> _logger;
         private readonly FlurlClient _flurlClient;
 
-        public IPBApiClient(IPBModuleConfig config, string? token, ILogger<IPBApiClient> logger, IHttpClientFactory httpClientFactory)
+        public IPBApiClient(IPBModuleConfig config, string? token, ILogger<IPBApiClient> logger,
+            IHttpClientFactory httpClientFactory)
         {
             _config = config;
             _token = token;
@@ -121,23 +124,26 @@ namespace BioEngine.Extra.IPB.Api
             return GetAsync<Topic>($"forums/topics/{topicId.ToString()}");
         }
 
-        public Task<Response<Post>> GetForumsPostsAsync(int[] forumIds = null, string orderBy = null,
+        public Task<Response<Post>> GetForumsPostsAsync(int[] forumIds, string orderBy = null,
             bool orderDescending = false, int page = 1, int perPage = 100)
         {
+            if (forumIds == null || forumIds.Length == 0)
+            {
+                throw new ArgumentException(nameof(forumIds));
+            }
+
             var url = $"forums/posts?page={page.ToString()}&perPage={perPage.ToString()}";
             if (!string.IsNullOrEmpty(orderBy))
             {
                 url += $"&sortBy={orderBy}";
             }
+
             if (orderDescending)
             {
                 url += "&sortDir=desc";
             }
 
-            if (forumIds != null && forumIds.Any())
-            {
-                url += $"&forums={string.Join(',', forumIds)}";
-            }
+            url += $"&forums={string.Join(',', forumIds)}";
 
             return GetAsync<Response<Post>>(url);
         }

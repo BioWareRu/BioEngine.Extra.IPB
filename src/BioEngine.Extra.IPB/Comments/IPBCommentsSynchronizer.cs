@@ -49,6 +49,11 @@ namespace BioEngine.Extra.IPB.Comments
                 }
             }
 
+            if (forumIds.Count == 0)
+            {
+                return;
+            }
+
             var client = _ipbApiClientFactory.GetReadOnlyClient();
 
             var posts = new List<Post>();
