@@ -145,7 +145,12 @@ namespace BioEngine.Extra.IPB.Comments
         {
             foreach (var post in posts)
             {
-                var record = records.First(r => r.TopicId == post.ItemId);
+                var record = records.FirstOrDefault(r => r.TopicId == post.ItemId);
+                if (record == null)
+                {
+                    continue;
+                }
+
                 var comment = await _dbContext.Set<IPBComment>().Where(c => c.PostId == post.Id)
                                   .FirstOrDefaultAsync() ?? new IPBComment
                               {
