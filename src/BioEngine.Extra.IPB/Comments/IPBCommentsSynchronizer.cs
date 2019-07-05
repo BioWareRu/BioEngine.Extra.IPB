@@ -107,9 +107,14 @@ namespace BioEngine.Extra.IPB.Comments
                     while (true)
                     {
                         var response = await client.GetTopicPostsAsync(record.TopicId, page, 1000);
-                        posts.AddRange(response.Results);
                         foreach (var post in response.Results)
                         {
+                            if (post.Id == record.PostId)
+                            {
+                                continue;
+                            }
+
+                            posts.Add(post);
                             topicsPosts[record.TopicId].Add(post.Id);
                         }
 
@@ -147,6 +152,11 @@ namespace BioEngine.Extra.IPB.Comments
             {
                 var record = records.FirstOrDefault(r => r.TopicId == post.ItemId);
                 if (record == null)
+                {
+                    continue;
+                }
+
+                if (record.PostId == post.Id)
                 {
                     continue;
                 }
