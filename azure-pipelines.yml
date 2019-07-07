@@ -29,12 +29,8 @@ stages:
                         inputs:
                             command: custom
                             custom: 'pack'
-                            configuration: Release
-                            versioningScheme: byEnvVar
-                            versionEnvVar: Version
-                            verbosityPack: minimal
                             projects: src/**/*.csproj
-                            arguments: '--no-restore'
+                            arguments: '--no-restore  /p:Configuration=Release /p:PackageVersion=$(Version) --output $(Build.ArtifactStagingDirectory)'
 
                     -   task: PublishPipelineArtifact@0
                         displayName: 'Publish package as artifact'
