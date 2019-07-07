@@ -33,6 +33,7 @@ stages:
                             versionEnvVar: Version
                             verbosityPack: minimal
                             projects: src/**/*.csproj
+                            arguments: '--no-restore'
 
                     -   task: PublishPipelineArtifact@0
                         displayName: 'Publish package as artifact'
