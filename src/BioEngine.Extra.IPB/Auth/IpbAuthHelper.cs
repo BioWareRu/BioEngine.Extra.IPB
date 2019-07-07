@@ -1,17 +1,21 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using BioEngine.Extra.IPB.Api;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Extra.IPB.Auth
 {
     public static class IpbAuthHelper
     {
-        public static void AddIpbOauthAuthentication(this IServiceCollection services, IPBModuleConfig configuration)
+        public static void AddIpbOauthAuthentication(this IServiceCollection services,
+            IPBSiteModuleConfig configuration, IHostEnvironment environment)
         {
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o =>
             {
@@ -41,6 +45,13 @@ namespace BioEngine.Extra.IPB.Auth
                         }
                     };
                 });
+            if (!string.IsNullOrEmpty(configuration.DataProtectionPath))
+            {
+                services.AddDataProtection()
+                    .PersistKeysToFileSystem(new DirectoryInfo(configuration.DataProtectionPath))
+                    .SetApplicationName(environment.ApplicationName)
+                    .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
+            }
         }
 
         public static void InsertClaims(User user, ClaimsIdentity identity, string issuer, string token = null,

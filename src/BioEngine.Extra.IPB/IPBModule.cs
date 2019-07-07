@@ -63,7 +63,16 @@ namespace BioEngine.Extra.IPB
         public string ApiReadonlyKey { get; set; } = "";
     }
 
-    public class IPBSiteModule : IPBModule<IPBModuleConfig>
+    public class IPBSiteModuleConfig : IPBModuleConfig
+    {
+        public IPBSiteModuleConfig(Uri url) : base(url)
+        {
+        }
+
+        public string DataProtectionPath { get; set; } = "";
+    }
+
+    public class IPBSiteModule : IPBModule<IPBSiteModuleConfig>
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
@@ -71,7 +80,7 @@ namespace BioEngine.Extra.IPB
             base.ConfigureServices(services, configuration, environment);
             services.AddScoped<ICommentsProvider, IPBCommentsProvider>();
             services.AddScoped<ICurrentUserProvider, IPBSiteCurrentUserProvider>();
-            services.AddIpbOauthAuthentication(Config);
+            services.AddIpbOauthAuthentication(Config, environment);
         }
     }
 
