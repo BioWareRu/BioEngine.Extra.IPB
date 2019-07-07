@@ -27,7 +27,8 @@ stages:
                     -   task: DotNetCoreCLI@2
                         displayName: 'Create package'
                         inputs:
-                            command: pack
+                            command: custom
+                            custom: 'pack'
                             configuration: Release
                             versioningScheme: byEnvVar
                             versionEnvVar: Version
