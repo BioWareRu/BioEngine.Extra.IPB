@@ -148,6 +148,8 @@ namespace BioEngine.Extra.IPB.Comments
 
         private async Task ProcessPostsAsync(IEnumerable<Post> posts, IEnumerable<IPBPublishRecord> records)
         {
+            var postIds = posts.Select(p => p.Id).ToArray();
+            var existingPosts = await _dbContext.Set<IPBComment>().Where(p => postIds.Contains(p.PostId)).ToListAsync();
             foreach (var post in posts)
             {
                 var record = records.FirstOrDefault(r => r.TopicId == post.ItemId);
@@ -161,15 +163,14 @@ namespace BioEngine.Extra.IPB.Comments
                     continue;
                 }
 
-                var comment = await _dbContext.Set<IPBComment>().Where(c => c.PostId == post.Id)
-                                  .FirstOrDefaultAsync() ?? new IPBComment
-                              {
-                                  ContentId = record.ContentId,
-                                  AuthorId = post.Author?.Id ?? "0",
-                                  PostId = post.Id,
-                                  TopicId = post.ItemId,
-                                  DateAdded = post.Date
-                              };
+                var comment = existingPosts.FirstOrDefault(p => p.PostId == post.Id) ?? new IPBComment
+                {
+                    ContentId = record.ContentId,
+                    AuthorId = post.Author?.Id ?? "0",
+                    PostId = post.Id,
+                    TopicId = post.ItemId,
+                    DateAdded = post.Date
+                };
                 comment.DateUpdated = DateTimeOffset.Now;
                 comment.SiteIds = record.SiteIds;
                 if (comment.Id == Guid.Empty)
