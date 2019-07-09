@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -45,10 +47,20 @@ namespace BioEngine.Extra.IPB.Auth
                         if (_ipbApiOptions.DevMode)
                             return HandleAuthenticateDev(tokenString);
                         var user = await GetUserAsync(tokenString);
+                        var groupIds = new List<int> {_ipbApiOptions.AdminGroupId};
+                        groupIds.AddRange(_ipbApiOptions.AdditionalGroupIds);
                         if (user != null)
                         {
-                            var userTicket = AuthenticationTicket(user, tokenString);
-                            result = AuthenticateResult.Success(userTicket);
+                            if (!groupIds.Contains(user.PrimaryGroup.Id) &&
+                                !groupIds.Intersect(user.SecondaryGroups.Select(g => g.Id).ToList()).Any())
+                            {
+                                result = AuthenticateResult.Fail("Bad groups");
+                            }
+                            else
+                            {
+                                var userTicket = AuthenticationTicket(user, tokenString);
+                                result = AuthenticateResult.Success(userTicket);
+                            }
                         }
                         else
                         {

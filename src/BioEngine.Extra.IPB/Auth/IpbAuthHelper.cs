@@ -79,16 +79,6 @@ namespace BioEngine.Extra.IPB.Auth
                 {
                     identity.AddClaim(new Claim(ClaimTypes.Role, "admin"));
                 }
-
-                if (groups.Contains(options.PublisherGroupId))
-                {
-                    identity.AddClaim(new Claim(ClaimTypes.Role, "publisher"));
-                }
-
-                if (groups.Contains(options.EditorGroupId))
-                {
-                    identity.AddClaim(new Claim(ClaimTypes.Role, "editor"));
-                }
             }
         }
     }

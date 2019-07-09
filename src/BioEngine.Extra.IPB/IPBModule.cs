@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.Api.Auth;
 using BioEngine.Core.Comments;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Modules;
@@ -11,6 +14,7 @@ using BioEngine.Extra.IPB.Comments;
 using BioEngine.Extra.IPB.Properties;
 using BioEngine.Extra.IPB.Publishing;
 using BioEngine.Extra.IPB.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -51,8 +55,7 @@ namespace BioEngine.Extra.IPB
 
         public bool DevMode { get; set; }
         public int AdminGroupId { get; set; }
-        public int PublisherGroupId { get; set; }
-        public int EditorGroupId { get; set; }
+        public int[] AdditionalGroupIds { get; set; }
         public Uri Url { get; }
         public Uri ApiUrl => new Uri($"{Url!}/api");
         public string ApiClientId { get; set; } = "";
@@ -86,10 +89,17 @@ namespace BioEngine.Extra.IPB
 
     public class IPBApiModuleConfig : IPBModuleConfig
     {
-        public bool EnableAuth { get; set; }
+        public bool AuthEnabled { get; private set; }
+        public Dictionary<string, AuthorizationPolicy> Policies { get; private set; }
 
         public IPBApiModuleConfig(Uri url) : base(url)
         {
+        }
+
+        public void EnableAuth(Dictionary<string, AuthorizationPolicy> policies)
+        {
+            AuthEnabled = true;
+            Policies = policies;
         }
     }
 
@@ -105,11 +115,21 @@ namespace BioEngine.Extra.IPB
             services.AddScoped<IPropertiesOptionsResolver, IPBSectionPropertiesOptionsResolver>();
             services.AddScoped<ICurrentUserProvider, IPBApiCurrentUserProvider>();
 
-            if (Config.EnableAuth)
+            if (Config.AuthEnabled)
             {
                 services
                     .AddAuthentication("ipbToken")
                     .AddScheme<IPBTokenAuthOptions, TokenAuthenticationHandler>("ipbToken", null);
+                services.AddAuthorization(options =>
+                {
+                    options.AddPolicy(BioPolicies.Admin,
+                        builder => builder.RequireAuthenticatedUser().RequireClaim(ClaimTypes.Role, "admin"));
+                    options.AddPolicy(BioPolicies.User, builder => builder.RequireAuthenticatedUser());
+                    foreach (var policy in Config.Policies)
+                    {
+                        options.AddPolicy(policy.Key, policy.Value);
+                    }
+                });
             }
         }
     }
