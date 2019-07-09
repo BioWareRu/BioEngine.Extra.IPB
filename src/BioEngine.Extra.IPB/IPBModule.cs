@@ -64,6 +64,7 @@ namespace BioEngine.Extra.IPB
         public string AuthorizationEndpoint { get; set; } = "";
         public string TokenEndpoint { get; set; } = "";
         public string ApiReadonlyKey { get; set; } = "";
+        public string ApiPublishKey { get; set; } = "";
     }
 
     public class IPBSiteModuleConfig : IPBModuleConfig

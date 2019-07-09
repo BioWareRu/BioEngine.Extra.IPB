@@ -4,13 +4,11 @@ namespace BioEngine.Extra.IPB.Publishing
 {
     public class IPBPublishConfig : IContentPublisherConfig
     {
-        public IPBPublishConfig(int forumId, string accessToken)
+        public IPBPublishConfig(int forumId)
         {
             ForumId = forumId;
-            AccessToken = accessToken;
         }
 
         public int ForumId { get; }
-        public string AccessToken { get; }
     }
 }

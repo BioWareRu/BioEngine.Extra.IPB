@@ -32,7 +32,7 @@ namespace BioEngine.Extra.IPB.Publishing
 
         protected override async Task<bool> DoDeleteAsync(IPBPublishRecord record, IPBPublishConfig config)
         {
-            var apiClient = _apiClientFactory.GetClient(config.AccessToken);
+            var apiClient = _apiClientFactory.GetPublishClient();
             var result = await apiClient.PostAsync<TopicCreateModel, Topic>(
                 $"forums/topics/{record.TopicId.ToString()}",
                 new TopicCreateModel {Hidden = 1});
@@ -48,7 +48,7 @@ namespace BioEngine.Extra.IPB.Publishing
                 throw new ArgumentException("No content renderer is registered!");
             }
 
-            var apiClient = _apiClientFactory.GetClient(config.AccessToken);
+            var apiClient = _apiClientFactory.GetPublishClient();
 
             if (record.TopicId == 0)
             {

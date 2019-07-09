@@ -32,12 +32,27 @@ namespace BioEngine.Extra.IPB.Api
 
         public IPBApiClient GetClient(string token)
         {
-            return new IPBApiClient(_options, token, _logger, _httpClientFactory);
+            return new IPBApiClient(_options, token, null, _logger, _httpClientFactory);
         }
 
         public IPBApiClient GetReadOnlyClient()
         {
-            return new IPBApiClient(_options, null, _logger, _httpClientFactory);
+            if (string.IsNullOrEmpty(_options.ApiReadonlyKey))
+            {
+                throw new Exception("Api readonly key don't configured");
+            }
+
+            return new IPBApiClient(_options, null, _options.ApiReadonlyKey, _logger, _httpClientFactory);
+        }
+
+        public IPBApiClient GetPublishClient()
+        {
+            if (string.IsNullOrEmpty(_options.ApiPublishKey))
+            {
+                throw new Exception("Api publish key don't configured");
+            }
+
+            return new IPBApiClient(_options, null, _options.ApiPublishKey, _logger, _httpClientFactory);
         }
     }
 
@@ -45,14 +60,16 @@ namespace BioEngine.Extra.IPB.Api
     {
         private readonly IPBModuleConfig _config;
         private readonly string? _token;
+        private readonly string? _apiKey;
         private readonly ILogger<IPBApiClient> _logger;
         private readonly FlurlClient _flurlClient;
 
-        public IPBApiClient(IPBModuleConfig config, string? token, ILogger<IPBApiClient> logger,
+        public IPBApiClient(IPBModuleConfig config, string? token, string? apiKey, ILogger<IPBApiClient> logger,
             IHttpClientFactory httpClientFactory)
         {
             _config = config;
             _token = token;
+            _apiKey = apiKey;
             _logger = logger;
             _flurlClient = new FlurlClient(httpClientFactory.CreateClient());
         }
@@ -71,7 +88,14 @@ namespace BioEngine.Extra.IPB.Api
             }
             else
             {
-                requestUrl.SetQueryParam("key", _config.ApiReadonlyKey);
+                if (!string.IsNullOrEmpty(_apiKey))
+                {
+                    requestUrl.SetQueryParam("key", _apiKey);
+                }
+                else
+                {
+                    throw new Exception("No token and no key for ipb client");
+                }
             }
 
             return requestUrl;
