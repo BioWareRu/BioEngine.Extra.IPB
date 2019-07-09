@@ -69,18 +69,15 @@ namespace BioEngine.Extra.IPB.Publishing
             }
             else
             {
-                var topic = await apiClient.PostAsync<TopicCreateModel, Topic>(
+                await apiClient.PostAsync<TopicCreateModel, Topic>(
                     $"forums/topics/{record.TopicId.ToString()}",
-                    new TopicCreateModel {Title = item.Title, Hidden = !item.IsPublished ? 1 : 0, Author = int.Parse(item.AuthorId)});
-                if (topic.FirstPost != null)
-                {
-                    await apiClient.PostAsync<PostCreateModel, Post>(
-                        $"forums/posts/{topic.FirstPost.Id.ToString()}",
-                        new PostCreateModel
-                        {
-                            Post = await _contentRender.RenderHtmlAsync(item, site)
-                        });
-                }
+                    new TopicCreateModel
+                    {
+                        Title = item.Title,
+                        Hidden = !item.IsPublished ? 1 : 0,
+                        Author = int.Parse(item.AuthorId),
+                        Post = await _contentRender.RenderHtmlAsync(item, site)
+                    });
             }
 
             return record;
