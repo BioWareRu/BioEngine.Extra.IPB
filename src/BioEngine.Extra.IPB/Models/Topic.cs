@@ -25,5 +25,6 @@
         public int? Hidden { get; set; }
         public int? Pinned { get; set; }
         public string Post { get; set; } = "";
+        public int Author { get; set; }
     }
 }

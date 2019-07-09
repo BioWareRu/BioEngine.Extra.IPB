@@ -57,7 +57,8 @@ namespace BioEngine.Extra.IPB.Publishing
                     Forum = config.ForumId,
                     Title = item.Title,
                     Hidden = !item.IsPublished ? 1 : 0,
-                    Post = await _contentRender.RenderHtmlAsync(item, site)
+                    Post = await _contentRender.RenderHtmlAsync(item, site),
+                    Author = int.Parse(item.AuthorId)
                 };
                 var createdTopic = await apiClient.PostAsync<TopicCreateModel, Topic>("forums/topics", topic);
                 if (createdTopic.FirstPost != null)
@@ -75,7 +76,11 @@ namespace BioEngine.Extra.IPB.Publishing
                 {
                     await apiClient.PostAsync<PostCreateModel, Post>(
                         $"forums/posts/{topic.FirstPost.Id.ToString()}",
-                        new PostCreateModel {Post = await _contentRender.RenderHtmlAsync(item, site)});
+                        new PostCreateModel
+                        {
+                            Post = await _contentRender.RenderHtmlAsync(item, site),
+                            Author = int.Parse(item.AuthorId)
+                        });
                 }
             }
 

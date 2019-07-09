@@ -19,5 +19,6 @@ namespace BioEngine.Extra.IPB.Models
     public class PostCreateModel
     {
         public string Post { get; set; } = "";
+        public int Author { get; set; }
     }
 }
