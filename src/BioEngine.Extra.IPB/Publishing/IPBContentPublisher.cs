@@ -78,8 +78,7 @@ namespace BioEngine.Extra.IPB.Publishing
                         $"forums/posts/{topic.FirstPost.Id.ToString()}",
                         new PostCreateModel
                         {
-                            Post = await _contentRender.RenderHtmlAsync(item, site),
-                            Author = int.Parse(item.AuthorId)
+                            Post = await _contentRender.RenderHtmlAsync(item, site)
                         });
                 }
             }
