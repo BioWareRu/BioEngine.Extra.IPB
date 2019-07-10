@@ -65,5 +65,15 @@ namespace BioEngine.Extra.IPB.Comments
 
             return result;
         }
+
+        public override Task<BaseComment> AddCommentAsync(ContentItem entity, string text, string authorId, Guid? replyTo = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<BaseComment> UpdateCommentAsync(ContentItem entity, Guid commentId, string text)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
