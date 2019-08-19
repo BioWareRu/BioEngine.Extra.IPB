@@ -12,6 +12,9 @@ namespace BioEngine.Extra.IPB.Properties
     [PropertiesSet("Публикация на форуме", IsEditable = true)]
     public class IPBSitePropertiesSet : PropertiesSet
     {
+        [PropertiesElement("Включено?", PropertyElementType.Checkbox)]
+        public bool IsEnabled { get; set; }
+
         [PropertiesElement("Раздел на форуме", PropertyElementType.Dropdown)]
         public int ForumId { get; set; }
     }

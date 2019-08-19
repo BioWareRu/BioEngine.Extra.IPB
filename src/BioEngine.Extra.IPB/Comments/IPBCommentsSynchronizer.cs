@@ -43,7 +43,7 @@ namespace BioEngine.Extra.IPB.Comments
             foreach (var site in sites.items)
             {
                 var settings = await _propertiesProvider.GetAsync<IPBSitePropertiesSet>(site);
-                if (settings != null && settings.ForumId > 0 && !forumIds.Contains(settings.ForumId))
+                if (settings != null && settings.IsEnabled && settings.ForumId > 0 && !forumIds.Contains(settings.ForumId))
                 {
                     forumIds.Add(settings.ForumId);
                 }
