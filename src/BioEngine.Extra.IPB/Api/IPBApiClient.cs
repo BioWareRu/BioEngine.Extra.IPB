@@ -105,9 +105,18 @@ namespace BioEngine.Extra.IPB.Api
         }
 
 
-        private Task<T> GetAsync<T>(string url)
+        private async Task<T> GetAsync<T>(string url)
         {
-            return GetRequest(url).GetJsonAsync<T>();
+            try
+            {
+                return await GetRequest(url).GetJsonAsync<T>();
+            }
+            catch (FlurlHttpException ex)
+            {
+                _logger.LogError(ex, "Error in request to IPB: {errorText}. Response: {response}", ex.ToString(),
+                    await ex.GetResponseStringAsync());
+                throw;
+            }
         }
 
         public async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest item)
