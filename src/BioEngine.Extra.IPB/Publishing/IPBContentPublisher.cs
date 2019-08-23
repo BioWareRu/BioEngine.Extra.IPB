@@ -17,7 +17,7 @@ namespace BioEngine.Extra.IPB.Publishing
 
         public IPBContentPublisher(IPBApiClientFactory apiClientFactory, IContentRender contentRender,
             BioContext dbContext, BioEntitiesManager entitiesManager,
-            ILogger<IContentPublisher<IPBPublishConfig>> logger) : base(dbContext, logger, entitiesManager)
+            ILogger<IPBContentPublisher> logger) : base(dbContext, logger, entitiesManager)
         {
             _apiClientFactory = apiClientFactory;
             _contentRender = contentRender;

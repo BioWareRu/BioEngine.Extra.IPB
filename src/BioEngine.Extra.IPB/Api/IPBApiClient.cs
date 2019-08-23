@@ -19,20 +19,21 @@ namespace BioEngine.Extra.IPB.Api
     public class IPBApiClientFactory
     {
         private readonly IPBModuleConfig _options;
-        private readonly ILogger<IPBApiClient> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public IPBApiClientFactory(IPBModuleConfig options, ILogger<IPBApiClient> logger,
+        public IPBApiClientFactory(IPBModuleConfig options, ILoggerFactory loggerFactory,
             IHttpClientFactory httpClientFactory)
         {
             _options = options;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
             _httpClientFactory = httpClientFactory;
         }
 
         public IPBApiClient GetClient(string token)
         {
-            return new IPBApiClient(_options, token, null, _logger, _httpClientFactory);
+            return new IPBApiClient(_options, token, null, _loggerFactory.CreateLogger<IPBApiClient>(),
+                _httpClientFactory);
         }
 
         public IPBApiClient GetReadOnlyClient()
@@ -42,7 +43,8 @@ namespace BioEngine.Extra.IPB.Api
                 throw new Exception("Api readonly key don't configured");
             }
 
-            return new IPBApiClient(_options, null, _options.ApiReadonlyKey, _logger, _httpClientFactory);
+            return new IPBApiClient(_options, null, _options.ApiReadonlyKey,
+                _loggerFactory.CreateLogger<IPBApiClient>(), _httpClientFactory);
         }
 
         public IPBApiClient GetPublishClient()
@@ -52,7 +54,8 @@ namespace BioEngine.Extra.IPB.Api
                 throw new Exception("Api publish key don't configured");
             }
 
-            return new IPBApiClient(_options, null, _options.ApiPublishKey, _logger, _httpClientFactory);
+            return new IPBApiClient(_options, null, _options.ApiPublishKey, _loggerFactory.CreateLogger<IPBApiClient>(),
+                _httpClientFactory);
         }
     }
 

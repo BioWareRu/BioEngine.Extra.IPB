@@ -22,7 +22,7 @@ namespace BioEngine.Extra.IPB.Comments
         private readonly BioEntitiesManager _entitiesManager;
 
         public IPBCommentsProvider(BioContext dbContext,
-            ILogger<ICommentsProvider> logger,
+            ILogger<IPBCommentsProvider> logger,
             IPBModuleConfig options,
             IUserDataProvider userDataProvider, BioEntitiesManager entitiesManager)
             : base(dbContext, userDataProvider, logger)
