@@ -60,6 +60,10 @@ namespace BioEngine.Extra.IPB.Auth
                             {
                                 var userTicket = AuthenticationTicket(user, tokenString);
                                 result = AuthenticateResult.Success(userTicket);
+                                if (!TokenUsers.ContainsKey(tokenString))
+                                {
+                                    TokenUsers.TryAdd(tokenString, user);
+                                }
                             }
                         }
                         else
@@ -105,10 +109,6 @@ namespace BioEngine.Extra.IPB.Auth
             if (!exists)
             {
                 user = await GetUserInformationAsync(token);
-                if (user != null)
-                {
-                    TokenUsers.TryAdd(token, user);
-                }
             }
 
             return user;
