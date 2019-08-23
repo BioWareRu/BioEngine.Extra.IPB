@@ -54,7 +54,7 @@ namespace BioEngine.Extra.IPB.Auth
                             if (!groupIds.Contains(user.PrimaryGroup.Id) &&
                                 !groupIds.Intersect(user.SecondaryGroups.Select(g => g.Id).ToList()).Any())
                             {
-                                result = AuthenticateResult.Fail("Bad groups");
+                                result = AuthenticateResult.Fail($"Bad groups: {string.Join(", ", groupIds)}");
                             }
                             else
                             {
