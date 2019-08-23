@@ -128,7 +128,8 @@ namespace BioEngine.Extra.IPB.Api
             }
             catch (FlurlHttpException ex)
             {
-                _logger.LogError(ex, ex.ToString());
+                _logger.LogError(ex, "Error in request to IPB: {errorText}. Response: {response}", ex.ToString(),
+                    await ex.GetResponseStringAsync());
                 throw;
             }
         }
