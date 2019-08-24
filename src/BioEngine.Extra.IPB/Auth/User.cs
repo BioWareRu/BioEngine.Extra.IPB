@@ -14,7 +14,7 @@ namespace BioEngine.Extra.IPB.Auth
         public string PhotoUrl { get; set; } = "";
         public string ProfileUrl { get; set; } = "";
         public Group PrimaryGroup { get; set; } = new Group();
-        public Group[] SecondaryGroups { get; set; } = new Group[0];
+        public Group[]? SecondaryGroups { get; set; } = new Group[0];
 
         public int[] GetGroupIds()
         {
