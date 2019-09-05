@@ -84,7 +84,7 @@ namespace BioEngine.Extra.IPB.Comments
 
             var topicIds = posts.Select(p => p.ItemId).ToList();
             var records = await _dbContext.Set<IPBPublishRecord>().Where(r => topicIds.Contains(r.TopicId))
-                .ToListAsync();
+                .ToArrayAsync();
 
             await ProcessPostsAsync(posts.ToArray(), records);
 
@@ -93,7 +93,7 @@ namespace BioEngine.Extra.IPB.Comments
 
         public async Task SyncAllAsync()
         {
-            var records = await _dbContext.Set<IPBPublishRecord>().ToListAsync();
+            var records = await _dbContext.Set<IPBPublishRecord>().ToArrayAsync();
             var client = _ipbApiClientFactory.GetReadOnlyClient();
             var posts = new List<Post>();
             var topicsPosts = new Dictionary<int, List<int>>();
@@ -146,7 +146,7 @@ namespace BioEngine.Extra.IPB.Comments
             await _dbContext.SaveChangesAsync();
         }
 
-        private async Task ProcessPostsAsync(Post[] posts, IEnumerable<IPBPublishRecord> records)
+        private async Task ProcessPostsAsync(Post[] posts, IPBPublishRecord[] records)
         {
             var postIds = posts.Select(p => p.Id).ToArray();
             var existingPosts = await _dbContext.Set<IPBComment>().Where(p => postIds.Contains(p.PostId)).ToListAsync();
