@@ -10,7 +10,7 @@ namespace BioEngine.Extra.IPB.Auth
         {
         }
 
-        public override Task<string> GetAccessTokenAsync()
+        public override Task<string?> GetAccessTokenAsync()
         {
             return Task.FromResult(HttpContextAccessor.HttpContext.User.Claims
                 .FirstOrDefault(c => c.Type == "ipbToken")?.Value);

@@ -161,7 +161,7 @@ namespace BioEngine.Extra.IPB.Api
             return GetAsync<Topic>($"forums/topics/{topicId.ToString()}");
         }
 
-        public Task<Response<Post>> GetForumsPostsAsync(int[] forumIds, string orderBy = null,
+        public Task<Response<Post>> GetForumsPostsAsync(int[] forumIds, string? orderBy = null,
             bool orderDescending = false, int page = 1, int perPage = 100)
         {
             if (forumIds == null || forumIds.Length == 0)

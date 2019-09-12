@@ -54,8 +54,8 @@ namespace BioEngine.Extra.IPB.Auth
             }
         }
 
-        public static void InsertClaims(User user, ClaimsIdentity identity, string issuer, string token = null,
-            IPBModuleConfig options = null)
+        public static void InsertClaims(User user, ClaimsIdentity identity, string issuer, string? token = null,
+            IPBModuleConfig? options = null)
         {
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
             identity.AddClaim(new Claim(ClaimTypes.Name, user.Name));
