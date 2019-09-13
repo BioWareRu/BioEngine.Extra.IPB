@@ -15,7 +15,7 @@ namespace BioEngine.Extra.IPB.Auth
     public static class IpbAuthHelper
     {
         public static void AddIpbOauthAuthentication(this IServiceCollection services,
-            IPBSiteModuleConfig configuration, IHostEnvironment environment)
+            IPBUsersModuleConfig configuration, IHostEnvironment environment)
         {
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o =>
             {
@@ -37,7 +37,7 @@ namespace BioEngine.Extra.IPB.Auth
                         OnCreatingTicket = async context =>
                         {
                             var factory = context.HttpContext.RequestServices.GetRequiredService<IPBApiClientFactory>();
-                            var ipbOptions = context.HttpContext.RequestServices.GetRequiredService<IPBModuleConfig>();
+                            var ipbOptions = context.HttpContext.RequestServices.GetRequiredService<IPBUsersModuleConfig>();
                             var ipbApiClient = factory.GetClient(context.AccessToken);
                             var user = await ipbApiClient.GetUserAsync();
 
@@ -55,7 +55,7 @@ namespace BioEngine.Extra.IPB.Auth
         }
 
         public static void InsertClaims(User user, ClaimsIdentity identity, string issuer, string? token = null,
-            IPBModuleConfig? options = null)
+            IPBUsersModuleConfig? options = null)
         {
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
             identity.AddClaim(new Claim(ClaimTypes.Name, user.Name));
