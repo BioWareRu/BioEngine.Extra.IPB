@@ -76,6 +76,7 @@ namespace BioEngine.Extra.IPB.Publishing
                         Title = item.Title,
                         Hidden = !item.IsPublished ? 1 : 0,
                         Author = int.Parse(item.AuthorId),
+                        Forum = config.ForumId,
                         Post = await _contentRender.RenderHtmlAsync(item, site)
                     });
             }
