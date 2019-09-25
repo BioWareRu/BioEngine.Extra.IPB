@@ -38,13 +38,13 @@ namespace BioEngine.Extra.IPB.Comments
         }
 
         [SuppressMessage("ReSharper", "RCS1198")]
-        public override async Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(ContentItem[] entities)
+        public override async Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(ContentItem[] entities, Site site)
         {
             var types = entities.Select(e => _entitiesManager.GetKey(e)).Distinct().ToArray();
             var ids = entities.Select(e => e.Id).ToArray();
 
             var contentSettings = await DbContext.Set<IPBPublishRecord>()
-                .Where(s => types.Contains(s.Type) && ids.Contains(s.ContentId))
+                .Where(s => types.Contains(s.Type) && ids.Contains(s.ContentId) && s.SiteIds.Contains(site.Id))
                 .ToListAsync();
 
             var result = new Dictionary<Guid, Uri?>();
@@ -66,7 +66,8 @@ namespace BioEngine.Extra.IPB.Comments
             return result;
         }
 
-        public override Task<BaseComment> AddCommentAsync(ContentItem entity, string text, string authorId, Guid? replyTo = null)
+        public override Task<BaseComment> AddCommentAsync(ContentItem entity, string text, string authorId,
+            Guid? replyTo = null)
         {
             throw new NotImplementedException();
         }
