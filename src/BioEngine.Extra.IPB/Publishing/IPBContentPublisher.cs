@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Social;
@@ -16,14 +17,14 @@ namespace BioEngine.Extra.IPB.Publishing
         private readonly IContentRender _contentRender;
 
         public IPBContentPublisher(IPBApiClientFactory apiClientFactory, IContentRender contentRender,
-            BioContext dbContext, BioEntitiesManager entitiesManager,
-            ILogger<IPBContentPublisher> logger) : base(dbContext, logger, entitiesManager)
+            BioContext dbContext,
+            ILogger<IPBContentPublisher> logger) : base(dbContext, logger)
         {
             _apiClientFactory = apiClientFactory;
             _contentRender = contentRender;
         }
 
-        protected override async Task<IPBPublishRecord> DoPublishAsync(IPBPublishRecord record, ContentItem entity,
+        protected override async Task<IPBPublishRecord> DoPublishAsync(IPBPublishRecord record, IContentItem entity,
             Site site,
             IPBPublishConfig config)
         {
@@ -39,7 +40,7 @@ namespace BioEngine.Extra.IPB.Publishing
             return result.Hidden;
         }
 
-        private async Task<IPBPublishRecord> CreateOrUpdateContentPostAsync(IPBPublishRecord record, ContentItem item,
+        private async Task<IPBPublishRecord> CreateOrUpdateContentPostAsync(IPBPublishRecord record, IContentItem item,
             Site site,
             IPBPublishConfig config)
         {
@@ -58,7 +59,7 @@ namespace BioEngine.Extra.IPB.Publishing
                     Title = item.Title,
                     Hidden = !item.IsPublished ? 1 : 0,
                     Post = await _contentRender.RenderHtmlAsync(item, site),
-                    Author = int.Parse(item.AuthorId)
+                    Author = int.Parse(config.AuthorId)
                 };
                 var createdTopic = await apiClient.PostAsync<TopicCreateModel, Topic>("forums/topics", topic);
                 if (createdTopic.FirstPost != null)
@@ -75,7 +76,7 @@ namespace BioEngine.Extra.IPB.Publishing
                     {
                         Title = item.Title,
                         Hidden = !item.IsPublished ? 1 : 0,
-                        Author = int.Parse(item.AuthorId),
+                        Author = int.Parse(config.AuthorId),
                         Forum = config.ForumId,
                         Post = await _contentRender.RenderHtmlAsync(item, site)
                     });

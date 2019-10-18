@@ -165,6 +165,7 @@ namespace BioEngine.Extra.IPB.Comments
 
                 var comment = existingPosts.FirstOrDefault(p => p.PostId == post.Id) ?? new IPBComment
                 {
+                    ContentType = record.Type,
                     ContentId = record.ContentId,
                     AuthorId = post.Author?.Id ?? "0",
                     PostId = post.Id,

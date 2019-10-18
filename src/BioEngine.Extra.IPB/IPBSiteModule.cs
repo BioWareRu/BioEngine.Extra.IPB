@@ -13,7 +13,7 @@ namespace BioEngine.Extra.IPB
             IHostEnvironment environment)
         {
             base.ConfigureServices(services, configuration, environment);
-            services.AddScoped<ICommentsProvider, IPBCommentsProvider>();
+            services.AddScoped<ICommentsProvider<string>, IPBCommentsProvider>();
         }
     }
 

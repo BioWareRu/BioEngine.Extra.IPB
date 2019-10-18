@@ -1,6 +1,4 @@
-using BioEngine.Core.Abstractions;
 using BioEngine.Core.Users;
-using BioEngine.Extra.IPB.Auth;
 using BioEngine.Extra.IPB.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,9 +7,9 @@ using Microsoft.Extensions.Hosting;
 namespace BioEngine.Extra.IPB
 {
     public abstract class
-        IPBUsersModule<TConfig, TCurrentUserProvider> : BaseUsersModule<TConfig, User,
+        IPBUsersModule<TConfig, TCurrentUserProvider> : BaseUsersModule<TConfig, string,
             IPBUserDataProvider, TCurrentUserProvider> where TConfig : IPBUsersModuleConfig
-        where TCurrentUserProvider : class, ICurrentUserProvider
+        where TCurrentUserProvider : class, ICurrentUserProvider<string>
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)

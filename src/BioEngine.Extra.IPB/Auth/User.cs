@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BioEngine.Core.Abstractions;
 using BioEngine.Core.DB;
+using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Models;
 
 namespace BioEngine.Extra.IPB.Auth
 {
     [Entity("ipbuser")]
-    public class User : IUser
+    public class User : IUser<string>
     {
         public string Id { get; set; }
         public string Name { get; set; } = "";

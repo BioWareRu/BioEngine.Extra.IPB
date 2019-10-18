@@ -2,13 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using BioEngine.Core.Abstractions;
+using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace BioEngine.Extra.IPB.Auth
 {
-    public abstract class IPBCurrentUserProvider : ICurrentUserProvider
+    public abstract class IPBCurrentUserProvider : ICurrentUserProvider<string>
     {
         protected readonly IHttpContextAccessor HttpContextAccessor;
 
@@ -17,7 +17,7 @@ namespace BioEngine.Extra.IPB.Auth
             HttpContextAccessor = httpContextAccessor;
         }
 
-        public IUser CurrentUser
+        public IUser<string> CurrentUser
         {
             get
             {

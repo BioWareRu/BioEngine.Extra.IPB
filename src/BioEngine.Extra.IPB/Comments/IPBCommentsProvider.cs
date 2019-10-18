@@ -7,6 +7,7 @@ using BioEngine.Core.Abstractions;
 using BioEngine.Core.Comments;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Entities;
 using BioEngine.Extra.IPB.Publishing;
 using JetBrains.Annotations;
@@ -16,31 +17,29 @@ using Microsoft.Extensions.Logging;
 namespace BioEngine.Extra.IPB.Comments
 {
     [UsedImplicitly]
-    public class IPBCommentsProvider : BaseCommentsProvider
+    public class IPBCommentsProvider : BaseCommentsProvider<string>
     {
         private readonly IPBModuleConfig _options;
-        private readonly BioEntitiesManager _entitiesManager;
 
         public IPBCommentsProvider(BioContext dbContext,
             ILogger<IPBCommentsProvider> logger,
             IPBModuleConfig options,
-            IUserDataProvider userDataProvider, BioEntitiesManager entitiesManager)
+            IUserDataProvider<string> userDataProvider)
             : base(dbContext, userDataProvider, logger)
         {
             _options = options;
-            _entitiesManager = entitiesManager;
         }
 
 
-        protected override IQueryable<BaseComment> GetDbSet()
+        protected override IQueryable<BaseComment<string>> GetDbSet()
         {
             return DbContext.Set<IPBComment>();
         }
 
         [SuppressMessage("ReSharper", "RCS1198")]
-        public override async Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(ContentItem[] entities, Site site)
+        public override async Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(IContentItem[] entities, Site site)
         {
-            var types = entities.Select(e => _entitiesManager.GetKey(e)).Distinct().ToArray();
+            var types = entities.Select(e => e.GetKey()).Distinct().ToArray();
             var ids = entities.Select(e => e.Id).ToArray();
 
             var contentSettings = await DbContext.Set<IPBPublishRecord>()
@@ -52,7 +51,7 @@ namespace BioEngine.Extra.IPB.Comments
             {
                 Uri? uri = null;
                 var settings = contentSettings.FirstOrDefault(c =>
-                    c.Type == _entitiesManager.GetKey(entity) && c.ContentId == entity.Id);
+                    c.Type == entity.GetKey() && c.ContentId == entity.Id);
                 if (settings?.TopicId > 0)
                 {
                     uri = new Uri(
@@ -66,13 +65,13 @@ namespace BioEngine.Extra.IPB.Comments
             return result;
         }
 
-        public override Task<BaseComment> AddCommentAsync(ContentItem entity, string text, string authorId,
+        public override Task<BaseComment<string>> AddCommentAsync(IContentItem entity, string text, string authorId,
             Guid? replyTo = null)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<BaseComment> UpdateCommentAsync(ContentItem entity, Guid commentId, string text)
+        public override Task<BaseComment<string>> UpdateCommentAsync(IContentItem entity, Guid commentId, string text)
         {
             throw new NotImplementedException();
         }

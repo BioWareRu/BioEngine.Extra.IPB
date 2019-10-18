@@ -1,13 +1,18 @@
 using System;
+using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Modules;
 using BioEngine.Core.Properties;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Comments;
+using BioEngine.Extra.IPB.Entities;
 using BioEngine.Extra.IPB.Properties;
+using BioEngine.Extra.IPB.Publishing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace BioEngine.Extra.IPB
 {
@@ -45,5 +50,13 @@ namespace BioEngine.Extra.IPB
         public Uri ApiUrl => new Uri($"{Url!}/api");
         public string ApiReadonlyKey { get; set; } = "";
         public string ApiPublishKey { get; set; } = "";
+    }
+    
+    public class IpbBioContextConfigurator: IBioContextModelConfigurator{
+        public void Configure(ModelBuilder modelBuilder, ILogger<BioContext> logger)
+        {
+            modelBuilder.RegisterEntity<IPBPublishRecord>();
+            modelBuilder.RegisterEntity<IPBComment>();
+        }
     }
 }

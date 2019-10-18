@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Api.Response;
+using BioEngine.Core.Users;
 using BioEngine.Core.Web;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Models;
@@ -11,7 +12,8 @@ namespace BioEngine.Extra.IPB.Controllers
 {
     public class ForumsController : IPBController
     {
-        public ForumsController(BaseControllerContext context, IPBApiClientFactory factory) : base(context, factory)
+        public ForumsController(BaseControllerContext context, IPBApiClientFactory factory,
+            ICurrentUserProvider<string> currentUserProvider) : base(context, factory, currentUserProvider)
         {
         }
 
