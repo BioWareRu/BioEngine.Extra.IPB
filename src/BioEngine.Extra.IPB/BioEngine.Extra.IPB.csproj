@@ -15,8 +15,10 @@
     <PackageReference Include="BioEngine.Core.Api" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core')" />
     <PackageReference Include="BioEngine.Core.Social" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core')" />
     <PackageReference Include="BioEngine.Core.Comments" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core')" />
+    <PackageReference Include="BioEngine.Core.Users" Version="3.0.*" Condition="!Exists('..\..\..\BioEngine.Core')" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BioEngine.Core\src\BioEngine.Core.Users\BioEngine.Core.Users.csproj"  Condition="Exists('..\..\..\BioEngine.Core')" />
     <ProjectReference Include="..\..\..\BioEngine.Core\src\BioEngine.Core\BioEngine.Core.csproj" Condition="Exists('..\..\..\BioEngine.Core')" />
     <ProjectReference Include="..\..\..\BioEngine.Core\src\BioEngine.Core.Api\BioEngine.Core.Api.csproj" Condition="Exists('..\..\..\BioEngine.Core')" />
     <ProjectReference Include="..\..\..\BioEngine.Core\src\BioEngine.Core.Social\BioEngine.Core.Social.csproj" Condition="Exists('..\..\..\BioEngine.Core')" />

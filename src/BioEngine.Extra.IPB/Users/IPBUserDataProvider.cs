@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.Abstractions;
+using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace BioEngine.Extra.IPB.Users
 {
-    public class IPBUserDataProvider : IUserDataProvider
+    public class IPBUserDataProvider : IUserDataProvider<string>
     {
         private readonly IPBApiClientFactory _clientFactory;
         private readonly IMemoryCache _memoryCache;
@@ -27,14 +27,14 @@ namespace BioEngine.Extra.IPB.Users
             return $"ipbuserdata{userId}";
         }
 
-        private List<IUser> GetFromCache(IEnumerable<string> userIds)
+        private List<IUser<string>> GetFromCache(IEnumerable<string> userIds)
         {
             _logger.LogTrace("Get user data from cache");
-            return userIds.Select(GetCacheKey).Select(key => _memoryCache.Get<IUser>(key))
+            return userIds.Select(GetCacheKey).Select(key => _memoryCache.Get<IUser<string>>(key))
                 .Where(userData => userData != null).ToList();
         }
 
-        public async Task<List<IUser>> GetDataAsync(string[] userIds)
+        public async Task<List<IUser<string>>> GetDataAsync(string[] userIds)
         {
             var data = GetFromCache(userIds);
             var notFoundUserIds = userIds
@@ -52,7 +52,7 @@ namespace BioEngine.Extra.IPB.Users
             return data;
         }
 
-        private void SetToCache(IEnumerable<IUser> userData)
+        private void SetToCache(IEnumerable<IUser<string>> userData)
         {
             _logger.LogTrace("Set user data to cache");
             foreach (var data in userData)

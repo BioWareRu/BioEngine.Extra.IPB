@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.Abstractions;
 using BioEngine.Core.Properties;
+using BioEngine.Core.Users;
 using BioEngine.Extra.IPB.Api;
 using BioEngine.Extra.IPB.Models;
 using JetBrains.Annotations;
@@ -23,11 +23,11 @@ namespace BioEngine.Extra.IPB.Properties
     public class IPBSectionPropertiesOptionsResolver : IPropertiesOptionsResolver
     {
         private readonly IPBApiClientFactory _apiClientFactory;
-        private readonly ICurrentUserProvider _currentUserProvider;
+        private readonly ICurrentUserProvider<string> _currentUserProvider;
         private IPBApiClient _apiClient;
 
         public IPBSectionPropertiesOptionsResolver(IPBApiClientFactory apiClientFactory,
-            ICurrentUserProvider currentUserProvider)
+            ICurrentUserProvider<string> currentUserProvider)
         {
             _apiClientFactory = apiClientFactory;
             _currentUserProvider = currentUserProvider;
